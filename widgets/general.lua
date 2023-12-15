@@ -35,7 +35,7 @@ viva.registerWidgets({
 
             render.setColor(stack.style and stack.style.button or colors.button)
 
-            hitboxes.create(3,window.name..id,data.x+(stack.x*0.7)+7,data.y+(stack.y*0.7),(w+6)*0.7,10.85,function()
+            hitboxes.create(3,window.name..self.type..id,data.x+(stack.x*0.7)+7,data.y+(stack.y*0.7),(w+6)*0.7,10.85,function()
                 if self.func then
                     self.func()
                 end
@@ -67,7 +67,7 @@ viva.registerWidgets({
 
             render.setColor(stack.style and stack.style.frameBg or colors.frameBg)
 
-            hitboxes.create(3,window.name..id,data.x+7,data.y+(stack.y*0.7),10.85,10.85,function()
+            hitboxes.create(3,window.name..self.type..id,data.x+7,data.y+(stack.y*0.7),10.85,10.85,function()
                 _G[self.var]=not _G[self.var]
             end,function()
                 if !data.event then
@@ -77,7 +77,39 @@ viva.registerWidgets({
                 render.drawRoundedBox(stack.style and stack.style.frameRounding or style.frameRounding,10,stack.y,15.5,15.5)
 
                 render.setColor(stack.style and stack.style.text or colors.text)
-                render.drawText(29,stack.y+2,self.name)
+                render.drawText(29,stack.y+1,self.name)
+            end)
+
+            return {
+                x=0,
+                y=stack.y+19
+            }
+        end
+    },
+    {
+        "slider",
+        {
+            "name",
+            "var",
+            "data"
+        },
+        function(window,self,stack,id)
+            local data=window.data
+            local w,_=render.getTextSize(self.name)
+
+            render.setColor(stack.style and stack.style.button or colors.button)
+
+            hitboxes.create(3,window.name..self.type..id,data.x+(stack.x*0.7)+7,data.y+(stack.y*0.7),(data.width-(data.width*0.1))*0.7,10.85,function()
+                
+            end,function()
+                if !data.event then
+                    render.setColor(stack.style and stack.style.buttonHovered or colors.buttonHovered)
+                end
+            end,function()
+                render.drawRoundedBox(stack.style and stack.style.frameRounding or style.frameRounding,stack.x+10,stack.y,data.width-(data.width*0.1),15.5)
+
+                render.setColor(stack.style and stack.style.text or colors.text)
+                render.drawText(stack.x+data.width-(data.width*0.1)+27,stack.y,self.name,1)
             end)
 
             return {
@@ -97,7 +129,7 @@ viva.registerWidgets({
             render.setColor(stack.style and stack.style.frameBg or colors.frameBg)
 
             for ii=1,4 do
-                hitboxes.create(3,window.name..id..ii,data.x+2.45*ii+(24.5*(ii-1)),data.y+(stack.y*0.7),24.5,10.85,function()
+                hitboxes.create(3,window.name..self.type..id..ii,data.x+2.45*ii+(24.5*(ii-1)),data.y+(stack.y*0.7),24.5,10.85,function()
                     local offset={cursor.x,_G[self.var][ii]}
 
                     hook.add("mousemoved","cl_drag",function()
@@ -126,7 +158,7 @@ viva.registerWidgets({
                 end)
             end
 
-            hitboxes.create(3,window.name..id,data.x+12.25+(24.5*4),data.y+(stack.y*0.7),10.85,10.85,function()
+            hitboxes.create(3,window.name..self.type..id,data.x+12.25+(24.5*4),data.y+(stack.y*0.7),10.85,10.85,function()
                 viva:new(nil,{
                     width=100,
                     height=100,
