@@ -288,7 +288,7 @@ function viva:render()
     end
 end
 
-hook.add("inputPressed","",function(key)
+hook.add("inputPressed","_viva",function(key)
     if !hitboxes.filter(key) then
         return
     end
@@ -299,18 +299,19 @@ hook.add("inputPressed","",function(key)
 
         if cursor and cursor:withinAABox(Vector(data.x,data.y),Vector(data.x+data.width,data.y+data.height)) then
             if viva.windows[#viva.windows]!=window then
+                print(window.name)
                 table.remove(viva.windows,#viva.windows-(i-1))
 
                 viva.windows[#viva.windows+1]=window
                 
-                hook.add("inputReleased","",function(key)
+                hook.add("inputReleased","_viva",function(key)
                     if !hitboxes.filter(key) then
                         return
                     end
 
                     hitboxes.purge()
 
-                    hook.remove("inputReleased","")
+                    hook.remove("inputReleased","_viva")
                 end)
             end
             

@@ -97,13 +97,13 @@ viva.registerWidgets({
             local data=window.data
             local w,_=render.getTextSize(self.name)
 
-            render.setColor(stack.style and stack.style.button or colors.button)
+            render.setColor(stack.style and stack.style.frameBg or colors.frameBg)
 
             hitboxes.create(3,window.name..self.type..id,data.x+(stack.x*0.7)+7,data.y+(stack.y*0.7),(data.width-(data.width*0.1))*0.7,10.85,function()
                 
             end,function()
                 if !data.event then
-                    render.setColor(stack.style and stack.style.buttonHovered or colors.buttonHovered)
+                    render.setColor(stack.style and stack.style.frameBgHovered or colors.frameBgHovered)
                 end
             end,function()
                 render.drawRoundedBox(stack.style and stack.style.frameRounding or style.frameRounding,stack.x+10,stack.y,data.width-(data.width*0.1),15.5)
