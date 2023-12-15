@@ -5,11 +5,14 @@ viva.registerWidgets({
             "text",
             "color"
         },
-        function(window,stack,stackHeight)
-            render.setColor(stack.color)
-            render.drawText(3.5,stackHeight+1,stack.text)
+        function(window,self,stack)
+            render.setColor(self.color)
+            render.drawText(3.5,stack.y+1,self.text)
 
-            return stackHeight+18.5
+            return {
+                x=0,
+                y=stack.y+18.5
+            }
         end
     }
 })

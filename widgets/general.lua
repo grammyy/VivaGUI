@@ -6,18 +6,21 @@ viva.registerWidgets({
         {
             "text"
         },
-        function(window,stack,stackHeight)
+        function(window,self,stack)
             local data=window.data
-            local w,_=render.getTextSize(stack.text)
+            local w,_=render.getTextSize(self.text)
 
             render.setColor(colors.text)
-            render.drawText(16,stackHeight+1,stack.text)
+            render.drawText(16,stack.y+1,self.text)
 
             render.setColor(colors.separator)
-            render.drawRect(3.5,stackHeight+9.25-(style.separatorTextBorderSize/2),10,style.separatorTextBorderSize)
-            render.drawRect(18+w,stackHeight+9.25-(style.separatorTextBorderSize/2),(data.width-31)/0.7,style.separatorTextBorderSize)
+            render.drawRect(3.5,stack.y+9.25-(style.separatorTextBorderSize/2),10,style.separatorTextBorderSize)
+            render.drawRect(18+w,stack.y+9.25-(style.separatorTextBorderSize/2),(data.width-31)/0.7,style.separatorTextBorderSize)
 
-            return stackHeight+18.5
+            return {
+                x=0,
+                y=stack.y+18.5
+            }
         end
     },
     {
@@ -26,28 +29,31 @@ viva.registerWidgets({
             "text",
             "func"
         },
-        function(window,stack,stackHeight)
+        function(window,self,stack,id)
             local data=window.data
-            local w,_=render.getTextSize(stack.text)
+            local w,_=render.getTextSize(self.text)
 
             render.setColor(colors.button)
 
-            hitboxes.create(3,window.name..stack.type..stack.text,data.x+7,data.y+(stackHeight*0.7),(w+6)*0.7,10.85,function()
-                if stack.func then
-                    stack.func()
+            hitboxes.create(3,window.name..id,data.x+(stack.x*0.7)+7,data.y+(stack.y*0.7),(w+6)*0.7,10.85,function()
+                if self.func then
+                    self.func()
                 end
             end,function()
                 if !window.event then
                     render.setColor(colors.buttonHovered)
                 end
             end,function()
-                render.drawRoundedBox(style.frameRounding,10,stackHeight,w+6,15.5)
+                render.drawRoundedBox(style.frameRounding,stack.x+10,stack.y,w+6,15.5)
 
                 render.setColor(colors.text)
-                render.drawText((10+w/2)+3,stackHeight+2,stack.text,1)
+                render.drawText(stack.x+(10+w/2)+3,stack.y+2,self.text,1)
             end)
 
-            return stackHeight+19
+            return {
+                x=stack.x+32,
+                y=stack.y+19
+            }
         end
     },
     {
@@ -56,25 +62,28 @@ viva.registerWidgets({
             "var",
             "name"
         },
-        function(window,stack,stackHeight)
+        function(window,self,stack,id)
             local data=window.data
 
             render.setColor(colors.frameBg)
 
-            hitboxes.create(3,window.name..stack.type..stack.name,data.x+7,data.y+(stackHeight*0.7),10.85,10.85,function()
-                _G[stack.var]=not _G[stack.var]
+            hitboxes.create(3,window.name..id,data.x+7,data.y+(stack.y*0.7),10.85,10.85,function()
+                _G[self.var]=not _G[self.var]
             end,function()
                 if !window.event then
                     render.setColor(colors.frameBgHovered)
                 end
             end,function()
-                render.drawRoundedBox(style.frameRounding,10,stackHeight,15.5,15.5)
+                render.drawRoundedBox(style.frameRounding,10,stack.y,15.5,15.5)
 
                 render.setColor(colors.text)
-                render.drawText(29,stackHeight+2,stack.name)
+                render.drawText(29,stack.y+2,self.name)
             end)
 
-            return stackHeight+19
+            return {
+                x=0,
+                y=stack.y+19
+            }
         end
     },
     {
@@ -83,16 +92,16 @@ viva.registerWidgets({
             "name",
             "var"
         },
-        function(window,stack,stackHeight)
+        function(window,self,stack,id)
             local data=window.data
             render.setColor(colors.frameBg)
 
             for ii=1,4 do
-                hitboxes.create(3,window.name..stack.type..stack.var..ii,data.x+2.45*ii+(24.5*(ii-1)),data.y+(stackHeight*0.7),24.5,10.85,function()
-                    local offset={cursor.x,_G[stack.var][ii]}
+                hitboxes.create(3,window.name..id..ii,data.x+2.45*ii+(24.5*(ii-1)),data.y+(stack.y*0.7),24.5,10.85,function()
+                    local offset={cursor.x,_G[self.var][ii]}
 
                     hook.add("mousemoved","cl_drag",function()
-                        _G[stack.var][ii]=math.clamp(math.round((offset[2] or 255)+(cursor.x-offset[1])*3,1),0,255)
+                        _G[self.var][ii]=math.clamp(math.round((offset[2] or 255)+(cursor.x-offset[1])*3,1),0,255)
                     end)
 
                     hook.add("inputReleased","hitId",function(key)
@@ -108,16 +117,16 @@ viva.registerWidgets({
                         render.setColor(colors.frameBgHovered)
                     end
                 end,function()
-                    render.drawRect(3.5*ii+(35*(ii-1)),stackHeight,35,15.5)
+                    render.drawRect(3.5*ii+(35*(ii-1)),stack.y,35,15.5)
 
                     render.setColor(colors.text)
-                    render.drawText(3.5*ii+(35*(ii-1))+17.5,stackHeight+1,rgba[ii]..(_G[stack.var] or {0,0,0,0})[ii] or 255,1)
+                    render.drawText(3.5*ii+(35*(ii-1))+17.5,stack.y+1,rgba[ii]..(_G[self.var] or {0,0,0,0})[ii] or 255,1)
 
                     render.setColor(colors.frameBg)
                 end)
             end
 
-            hitboxes.create(3,window.name..stack.type..stack.var,data.x+12.25+(24.5*4),data.y+(stackHeight*0.7),10.85,10.85,function()
+            hitboxes.create(3,window.name..id,data.x+12.25+(24.5*4),data.y+(stack.y*0.7),10.85,10.85,function()
                 viva:new(nil,{
                     width=100,
                     height=100,
@@ -129,14 +138,17 @@ viva.registerWidgets({
                     self:textColored("Important stuff!",Color(timer.realtime()*10,1,1):hsvToRGB())
                 end)
             end,nil,function()
-                render.setColor(_G[stack.var] or colors.textDisabled)
-                render.drawRect(157.5,stackHeight,15.5,15.5)
+                render.setColor(_G[self.var] or colors.textDisabled)
+                render.drawRect(157.5,stack.y,15.5,15.5)
             end)
             
             render.setColor(colors.text)
-            render.drawText(177,stackHeight+1,stack.name)
+            render.drawText(177,stack.y+1,self.name)
 
-            return stackHeight+18.5
+            return {
+                x=0,
+                y=stack.y+18.5
+            }
         end
     }
 })

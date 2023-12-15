@@ -1,18 +1,6 @@
-function viva.constructor(flags)
-    return{
-        noTitlebar=flags.noTitlebar or false,
-        noScrollbar=flags.noScrollbar or false,
-        noMenu=flags.noMenu or false,
-        noMove=flags.noMove or false,
-        noResize=flags.noResize or false,
-        noCollapse=flags.noCollapse or false,
-        noNav=flags.noNav or false,
-        noBackground=flags.noBackground or false,
-        noBringToFront=flags.noBringToFront or false,
-        noDocking=flags.noDocking or false,
-        noClose=flags.noClose or false,
-    }
-end
+viva=class("vivagui")
+viva.windows={}
+viva.widgets={}
 
 function viva.init(flags)
     if !flags or !flags.config or !flags.style then
@@ -162,4 +150,42 @@ function viva.init(flags)
             DisplaySafeAreaPadding=flags.style.DisplaySafeAreaPadding or Vector(3,3)
         }
     }
+end
+
+function viva.constructor(flags)
+    return{
+        noTitlebar=flags.noTitlebar or false,
+        noScrollbar=flags.noScrollbar or false,
+        noMenu=flags.noMenu or false,
+        noMove=flags.noMove or false,
+        noResize=flags.noResize or false,
+        noCollapse=flags.noCollapse or false,
+        noNav=flags.noNav or false,
+        noBackground=flags.noBackground or false,
+        noBringToFront=flags.noBringToFront or false,
+        noDocking=flags.noDocking or false,
+        noClose=flags.noClose or false,
+    }
+end
+
+function viva.registerWidget(name,stack,func)
+    viva[name]=function(self,...)
+        local arguments={
+            type=name
+        }
+
+        for i,v in ipairs({...}) do
+            arguments[stack[i]]=v
+        end
+
+        self.drawStack[#self.drawStack+1]=arguments
+    end
+
+    viva.widgets[name]=func
+end
+
+function viva.registerWidgets(widgets)
+    for i,widget in pairs(widgets) do
+        viva.registerWidget(widget[1],widget[2],widget[3])
+    end
 end

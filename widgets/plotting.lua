@@ -5,28 +5,31 @@ viva.registerWidgets({
             "name",
             "table"
         },
-        function(window,stack,stackHeight)
+        function(window,self,stack)
             local data=window.data
 
             render.setColor(colors.frameBg)
-            render.drawRect(3.5,stackHeight,169.5,15.5)
+            render.drawRect(3.5,stack.y,169.5,15.5)
 
-            for i,value in pairs(stack.table) do
-                local hovering=cursor:withinAABox(Vector(data.x,data.y)+Vector(3.5+(118.65*((i-1)/(#stack.table-1))),stackHeight*0.7),Vector(data.x,data.y)+Vector(3.5+(118.65*((i)/(#stack.table-1))),(stackHeight+15.5)*0.7))
+            for i,value in pairs(self.table) do
+                local hovering=cursor:withinAABox(Vector(data.x,data.y)+Vector(3.5+(118.65*((i-1)/(#self.table-1))),stack.y*0.7),Vector(data.x,data.y)+Vector(3.5+(118.65*((i)/(#self.table-1))),(stack.y+15.5)*0.7))
 
-                if i==#stack.table then
+                if i==#self.table then
                     break
                 end
 
                 render.setColor(hovering and colors.plotLinesHovered or colors.plotLines)
 
-                render.drawLine(3.5+(169.5*((i-1)/(#stack.table-1))),stackHeight+7.75-value,3.5+(169.5*((i)/(#stack.table-1))),stackHeight+7.75-stack.table[i+1])
+                render.drawLine(3.5+(169.5*((i-1)/(#self.table-1))),stack.y+7.75-value,3.5+(169.5*((i)/(#self.table-1))),stack.y+7.75-self.table[i+1])
             end
 
             render.setColor(colors.text)
-            render.drawText(177,stackHeight+1,stack.name)
+            render.drawText(177,stack.y+1,self.name)
 
-            return stackHeight+18.5
+            return {
+                x=0,
+                y=stack.y+18.5
+            }
         end
     }
 })
