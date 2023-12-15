@@ -8,7 +8,7 @@ viva.registerWidgets({
         function(window,self,stack)
             local data=window.data
 
-            render.setColor(colors.frameBg)
+            render.setColor(stack.style and stack.style.frameBg or colors.frameBg)
             render.drawRect(3.5,stack.y,169.5,15.5)
 
             for i,value in pairs(self.table) do
@@ -18,12 +18,12 @@ viva.registerWidgets({
                     break
                 end
 
-                render.setColor(hovering and colors.plotLinesHovered or colors.plotLines)
+                render.setColor(hovering and colors.plotLinesHovered or (stack.style and stack.style.plotLines or colors.plotLines))
 
                 render.drawLine(3.5+(169.5*((i-1)/(#self.table-1))),stack.y+7.75-value,3.5+(169.5*((i)/(#self.table-1))),stack.y+7.75-self.table[i+1])
             end
 
-            render.setColor(colors.text)
+            render.setColor(stack.style and stack.style.text or colors.text)
             render.drawText(177,stack.y+1,self.name)
 
             return {

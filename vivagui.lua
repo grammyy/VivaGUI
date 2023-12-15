@@ -48,6 +48,19 @@ function viva:sameLine()
     }
 end
 
+function viva:pushStyle(style)
+    self.drawStack[#self.drawStack+1]={
+        type="pushStyle",
+        style=style
+    }
+end
+
+function viva:popStyle()
+    self.drawStack[#self.drawStack+1]={
+        type="popStyle"
+    }
+end
+
 function viva:render()
     render.setFilterMin(1)
     render.setFilterMag(1)
@@ -76,7 +89,16 @@ function viva:render()
             }
 
             for i,self in pairs(window.drawStack) do
+                if self.type=="pushStyle" then
+                    stack.style=self.style
+                end
+
+                if self.type=="popStyle" then
+                    stack.style=nil
+                end
+
                 if viva.widgets[self.type] then
+
                     local modifier=window.drawStack[i+1]
                     local draw=viva.widgets[self.type](window,self,stack,i) 
                     
