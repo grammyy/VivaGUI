@@ -299,7 +299,6 @@ hook.add("inputPressed","_viva",function(key)
 
         if cursor and cursor:withinAABox(Vector(data.x,data.y),Vector(data.x+data.width,data.y+data.height)) then
             if viva.windows[#viva.windows]!=window then
-                print(window.name)
                 table.remove(viva.windows,#viva.windows-(i-1))
 
                 viva.windows[#viva.windows+1]=window
