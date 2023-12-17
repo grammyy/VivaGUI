@@ -7,10 +7,11 @@ _hitboxes={}
 
 cursorFunc=function()
     x,y=render.cursorPos()
+    
     return Vector(x,y) or Vector()
 end
 
-function hitboxes.create(layer,id,x,y,w,h,callback,hover,renderFunc)
+function hitboxes.create(window,layer,id,x,y,w,h,callback,hover,renderFunc)
     if !_hitboxes[layer] then
         _hitboxes[layer]={}
     end
@@ -33,7 +34,8 @@ function hitboxes.create(layer,id,x,y,w,h,callback,hover,renderFunc)
         w=w,
         h=h,
         callback=callback,
-        hover=false
+        hover=false,
+        window=window
     }
 end
 
@@ -111,11 +113,21 @@ hook.add("think","cl_hitboxes",function()
         end
 
         if cursor:withinAABox(Vector(hitbox.x,hitbox.y),Vector(hitbox.x+hitbox.w,hitbox.y+hitbox.h)) then
+            local frontWindow=viva.windows[#viva.windows]
+
             if i!=0 then
                 curLayer=i
             end
 
-            hitbox.hover=true
+            if hitbox.window==frontWindow then
+                hitbox.hover=true
+            else
+                if !cursor:withinAABox(Vector(frontWindow.data.x,frontWindow.data.y),Vector(frontWindow.data.x+frontWindow.data.width,frontWindow.data.y+frontWindow.data.height)) then
+                    hitbox.hover=true
+                else
+                    hitbox.hover=false
+                end
+            end
         else
             hitbox.hover=false
         end
@@ -125,7 +137,7 @@ end)
 hook.add("inputPressed","_vivahitboxes",function(key)
     hitboxes.each(_hitboxes,function(i,id,hitbox)
         if hitbox.hover and hitbox.callback then
-            if hitboxes.filter and !hitboxes.filter(key) then
+            if hitboxes.filter and !hitboxes.filter(key,hitbox,i,id) then
                 return
             end
 

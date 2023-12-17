@@ -61,10 +61,31 @@ function viva:popStyle()
     }
 end
 
+function viva:dragEvent(func,cleanup,name)
+    hook.add("mousemoved",table.address(func),function()
+        self.data.event=name or "dragging"
+
+        func()
+    end)
+
+    hook.add("inputReleased",table.address(func),function(key)
+        if hitboxes.filter(key) then
+            hook.remove("mousemoved",table.address(func))
+            hook.remove("inputReleased",table.address(func))
+
+            self.data.event=nil
+
+            if cleanup then
+                cleanup()
+            end
+        end
+    end)
+end
+
 function viva:render()
     render.setFilterMin(1)
     render.setFilterMag(1)
-
+    
     --viva.tooltip(cursor.x+10,cursor.y,30,10)
 
     for id,window in pairs(viva.windows) do
@@ -85,33 +106,35 @@ function viva:render()
 
             local stack={
                 x=0,
-                y=table.count(data.menuItems)!=0 and 38 or 21
+                y=(!window.flags.noMenu and table.count(data.menuItems)!=0) and 38 or 21
             }
 
             for i,self in pairs(window.drawStack) do
-                if self.type=="pushStyle" then
-                    stack.style=self.style
-                end
+                if stack.y<(data.height/0.7)-20 then
+                    if self.type=="pushStyle" then
+                        stack.style=self.style
+                    end
 
-                if self.type=="popStyle" then
-                    stack.style=nil
-                end
+                    if self.type=="popStyle" then
+                        stack.style=nil
+                    end
 
-                if viva.widgets[self.type] then
+                    if viva.widgets[self.type] then
 
-                    local modifier=window.drawStack[i+1]
-                    local draw=viva.widgets[self.type](window,self,stack,i) 
-                    
-                    if (modifier and modifier.type!="sameLine") then
-                        stack.y=draw.y
-                        stack.x=0
-                    else
-                        stack.x=draw.x
+                        local modifier=window.drawStack[i+1]
+                        local draw=viva.widgets[self.type](window,self,stack,i) 
+                        
+                        if (modifier and modifier.type!="sameLine") then
+                            stack.y=draw.y
+                            stack.x=0
+                        else
+                            stack.x=draw.x
+                        end
                     end
                 end
             end
 
-            if !window.flags.noTitlebar then
+            if !window.flags.noMenu then
                 if table.count(data.menuItems)!=0 then
                     local i=-1
 
@@ -127,7 +150,7 @@ function viva:render()
                             render.drawRect(2+(25*i)+2*i,18,25,15.5)
                         end
 
-                        hitboxes.create(3,item..table.address(self),data.x+1.4+(17.5*i)+1.4*i,data.y+12.6,17.5,10.85,function()
+                        hitboxes.create(window,3,item..table.address(self),data.x+1.4+(17.5*i)+1.4*i,data.y+12.6,17.5,10.85,function()
                             if data.menuItem==item then
                                 data.menuItem=nil
                             else
@@ -161,7 +184,7 @@ function viva:render()
                             render.setColor(colors.text)
 
                             for ii=1,#buttons do
-                                hitboxes.create(3,table.address(window).."button"..ii,data.x+3.5+(17.5*i),data.y+15.4+(10.85*ii),72.8,10.85,function()
+                                hitboxes.create(window,3,table.address(window).."button"..ii,data.x+3.5+(17.5*i),data.y+15.4+(10.85*ii),72.8,10.85,function()
                                     if buttons[ii][2] then
                                         buttons[ii][2](window)
                                     end
@@ -186,33 +209,20 @@ function viva:render()
             render.popMatrix()
         end
 
-        hitboxes.create(2,table.address(window).."titlebar",data.x,data.y,data.width,12,function()
+        hitboxes.create(window,2,table.address(window).."titlebar",data.x,data.y,data.width,12,function()
             local offset=Vector(data.x,data.y)-cursor
-            data.event="dragging"
-
-            hook.add("mousemoved","cl_drag",function()
+            
+            window:dragEvent(function()
                 data.x=cursor.x+offset.x
                 data.y=cursor.y+offset.y
-            end)
+            end,hitboxes.purge)
 
-            hook.add("inputReleased","hitId",function(key)
-                if !hitboxes.filter(key) then
-                    return
-                end
-                
-                hook.remove("mousemoved","cl_drag")
-                hook.remove("inputReleased","hitId")
-
-                hitboxes.purge()
-
-                data.event=nil
-            end)
         end,nil,function()
             render.setColor(data.active and colors.titleBgActive or colors.titleBg)
             render.drawRoundedBoxEx(style.windowRounding,data.x,data.y,data.width,12,true,true,false,false)
         end)
 
-        hitboxes.create(2,table.address(window).."toggle",data.x+2.5,data.y+2.5,6.5,6.5,function()
+        hitboxes.create(window,2,table.address(window).."toggle",data.x+2.5,data.y+2.5,6.5,6.5,function()
             data.active=not data.active
 
             hitboxes.purge()
@@ -222,8 +232,8 @@ function viva:render()
             render.drawTriangle(data.x+3,data.y+3,6,6,data.active and 0 or -90)
         end)
 
-        hitboxes.create(2,table.address(window).."close",data.x+data.width-10,data.y+2.5,6.5,6.5,function()
-            viva.windows[table.address(window)]=nil
+        hitboxes.create(window,2,table.address(window).."close",data.x+data.width-10,data.y+2.5,6.5,6.5,function()
+            table.removeByValue(viva.windows,window)
             self=nil
 
             hitboxes.purge()
@@ -235,27 +245,14 @@ function viva:render()
 
         render.setColor(colors.resizeGrip)
 
-        hitboxes.create(1,table.address(window).."resize",data.x+data.width-6,data.y+data.height-6,6,6,function()
+        hitboxes.create(window,1,table.address(window).."resize",data.x+data.width-6,data.y+data.height-6,6,6,function()
             local offset=Vector(data.width,data.height)-cursor
-            data.event="resizing"
     
-            hook.add("mousemoved","cl_drag",function()
+            window:dragEvent(function()
                 data.width=math.max(cursor.x+offset.x,8.4)
                 data.height=math.max(cursor.y+offset.y,8.4)
-            end)
-    
-            hook.add("inputReleased","hitId",function(key)
-                if !hitboxes.filter(key) then
-                    return
-                end
-
-                hook.remove("mousemoved","cl_drag")
-                hook.remove("inputReleased","hitId")
-    
-                hitboxes.purge()
-    
-                data.event=nil
-            end)
+            end,hitboxes.purge,"resizing")
+            
         end,function()
             if !data.event then
                 render.setColor(colors.resizeGripHovered)
