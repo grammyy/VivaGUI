@@ -1,0 +1,111 @@
+--extremely simple, ignore all bad practices
+
+--@name Viva testing
+--@author Elias
+--@include VivaGUI/vivagui.lua
+--@client
+
+require("VivaGUI/vivagui.lua")
+
+testColor=Color(255,255,0)
+samples={}
+bool=true
+
+viva:new("My first tool",{
+    width=170,
+    height=140
+},nil,function(self)
+    self:newMenu("File",{
+        {
+            "Open..",
+            function()end,
+            "Ctrl+O"
+        },
+        {
+            "Save",
+            function()end,
+            "Ctrl+S"
+        },
+        {
+            "Close",
+            function(self)
+                viva.windows[self.name]=nil
+                self=nil
+            end,
+            "Ctrl+W"
+        }
+    })
+
+    self:colorEdit4("Color","testColor")
+
+    self:plotLines("Samples",samples)
+    
+    self:textColored("Important stuff!",testColor)
+end)
+
+viva:new("style editor",{
+    width=150,
+    height=250,
+    x=300,
+    y=70
+},nil,function(self)
+    windowBg=colors.windowBg
+    border=colors.border
+    frameBg=colors.frameBg
+    menuBarBg=colors.menuBarBg
+    windowRounding=style.windowRounding
+    frameRounding=style.frameRounding
+    
+    self:textColored("Important stuff!",testColor)
+    
+    self:colorEdit4("Color","windowBg")
+    self:colorEdit4("Color","border")
+    self:colorEdit4("Color","frameBg")
+    self:colorEdit4("Color","menuBarBg")
+    
+    self:separatorText("Main")
+    
+    self:button("bleh",function()
+        print("real")
+    end)
+    
+    self:sameLine()
+    self:pushStyle({
+        button=Color(255,0,0)
+    })
+    
+    self:button("bleh",function()
+        print("real")
+    end)
+    
+    self:popStyle()
+    
+    self:checkbox(bool,"checkbox")
+    
+    self:slider("windowRounding","windowRounding",{
+        min=0,
+        max=20,
+    },function(float)
+        style.windowRounding=float
+        
+        return math.round(float).." ; "..style.windowRounding
+    end)
+    
+    self:slider("frameRounding","frameRounding",{
+        min=0,
+        max=12,
+    },function(float)
+        style.frameRounding=float
+        
+        return math.round(float).." ; "..style.frameRounding
+    end)
+end)
+
+hook.add("render","",function()
+    for i=1,25 do
+        samples[i]=math.sin(i*0.4+timer.realtime()*3)*5
+    end
+
+    viva:render()
+    --hitboxes.renderDebug()
+end)

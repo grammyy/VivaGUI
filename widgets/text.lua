@@ -7,10 +7,10 @@ viva.registerWidgets({
         },
         function(window,self,stack)
             render.setColor(self.color)
-            render.drawText(3.5,stack.y+1,self.text)
+            render.drawText(stack.x,stack.y+1,self.text)
 
             return {
-                x=0,
+                x=stack.x,
                 y=stack.y+18.5
             }
         end

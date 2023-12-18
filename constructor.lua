@@ -103,10 +103,10 @@ function viva.init(flags)
             frameBorder=flags.style.frameBorder or false,
             popupBorder=flags.style.popupBorder or true,
 
-            windowPadding=flags.style.windowPadding or Vector(8,8),
-            framePadding=flags.style.framePadding or Vector(4,3),
-            itemSpacing=flags.style.itemSpacing or Vector(8,4),
-            itemInnerSpacing=flags.style.itemInnerSpacing or Vector(4,4),
+            windowPadding=flags.style.windowPadding or {8,8},
+            framePadding=flags.style.framePadding or {4,3},
+            itemSpacing=flags.style.itemSpacing or {8,4},
+            itemInnerSpacing=flags.style.itemInnerSpacing or {4,4},
             indentSpacing=flags.style.indentSpacing or 21,
             scrollBarSize=flags.style.scrollBarSize or 14,
             grabMinSize=flags.style.grabMinSize or 12,
@@ -126,17 +126,17 @@ function viva.init(flags)
             grabRounding=flags.style.grabRounding or 3,
             tabRounding=flags.style.tabRounding or 3,
 
-            cellPadding=flags.style.cellPadding or Vector(4,2),
+            cellPadding=flags.style.cellPadding or {4,2},
             tableAngledHeadersAngle=flags.style.tableAngledHeadersAngle or 35,
 
-            windowTitleAlign=flags.style.windowTitleAlign or Vector(0,0.5),
+            windowTitleAlign=flags.style.windowTitleAlign or {0,0.5},
             windowMenuButtonPosition=flags.style.windowMenuButtonPosition or "left",
             colorButtonPosition=flags.style.colorButtonPosition or "right",
-            buttonTextAlign=flags.style.buttonTextAlign or Vector(0.5,0.5),
-            selectableTextAlign=flags.style.selectableTextAlign or Vector(0,0),
+            buttonTextAlign=flags.style.buttonTextAlign or {0.5,0.5},
+            selectableTextAlign=flags.style.selectableTextAlign or {0,0},
             separatorTextBorderSize=flags.style.separatorTextBorderSize or 3,
-            separatorTextAlign=flags.style.separatorTextAlign or Vector(0,0.5),
-            separatorTextPadding=flags.style.separatorTextPadding or Vector(20,3),
+            separatorTextAlign=flags.style.separatorTextAlign or {0,0.5},
+            separatorTextPadding=flags.style.separatorTextPadding or {20,3},
             logSliderDeadzone=flags.style.logSliderDeadzone or 4,
 
             dockingSplitterSize=flags.style.dockingSplitterSize or 2,
@@ -147,7 +147,7 @@ function viva.init(flags)
             hoveredFlagsDelayStationary=flags.style.hoveredFlagsDelayStationary or true,
             hoveredFlagsNoSharedDelay=flags.style.hoveredFlagsNoSharedDelay or false,
 
-            DisplaySafeAreaPadding=flags.style.DisplaySafeAreaPadding or Vector(3,3)
+            DisplaySafeAreaPadding=flags.style.DisplaySafeAreaPadding or {3,3}
         }
     }
 end

@@ -105,8 +105,8 @@ function viva:render()
             render.pushMatrix(context)
 
             local stack={
-                x=0,
-                y=(!window.flags.noMenu and table.count(data.menuItems)!=0) and 38 or 21
+                x=style.windowPadding[1]/2,
+                y=(!window.flags.noMenu and table.count(data.menuItems)!=0) and 38+(style.windowPadding[2]-6) or 20+(style.windowPadding[2]-6)
             }
 
             for i,self in pairs(window.drawStack) do
@@ -126,7 +126,7 @@ function viva:render()
                         
                         if (modifier and modifier.type!="sameLine") then
                             stack.y=draw.y
-                            stack.x=0
+                            stack.x=style.windowPadding[1]/2
                         else
                             stack.x=draw.x
                         end
@@ -216,10 +216,10 @@ function viva:render()
                 data.x=cursor.x+offset.x
                 data.y=cursor.y+offset.y
             end,hitboxes.purge)
-
         end,nil,function()
             render.setColor(data.active and colors.titleBgActive or colors.titleBg)
             render.drawRoundedBoxEx(style.windowRounding,data.x,data.y,data.width,12,true,true,false,false)
+            --visual bug: create function parented from drawRoundedBox to Ex fill instead ^
         end)
 
         hitboxes.create(window,2,table.address(window).."toggle",data.x+2.5,data.y+2.5,6.5,6.5,function()
@@ -252,7 +252,6 @@ function viva:render()
                 data.width=math.max(cursor.x+offset.x,8.4)
                 data.height=math.max(cursor.y+offset.y,8.4)
             end,hitboxes.purge,"resizing")
-            
         end,function()
             if !data.event then
                 render.setColor(colors.resizeGripHovered)
@@ -269,6 +268,7 @@ function viva:render()
                     Vector(data.x+data.width-6,data.y+data.height),
                     Vector(data.x+data.width,data.y+data.height-6)
                 })
+                --visual bug: create function to draw curve ^
             end
         end)
 
