@@ -1,7 +1,7 @@
 --extremely simple, ignore all bad practices
 --recoding next update
 
---@name Viva testing
+--@name Viva Testing
 --@author Elias
 --@include VivaGUI/vivagui.lua
 --@client
@@ -10,7 +10,7 @@ require("VivaGUI/vivagui.lua")
 
 testColor=Color(255,255,0)
 samples={}
-bool=true
+bool=false
 
 viva:new("My first tool",{
     width=170,
@@ -56,6 +56,8 @@ viva:new("style editor",{
     menuBarBg=colors.menuBarBg
     windowRounding=style.windowRounding
     frameRounding=style.frameRounding
+    windowBorderSize=style.windowBorderSize
+    grabRounding=style.grabRounding
     
     self:textColored("Important stuff!",testColor)
     
@@ -79,26 +81,62 @@ viva:new("style editor",{
         print("real")
     end)
     
+    self:sameLine()
+    
+    self:button("bleh",function()
+        print("real")
+    end)
+    
+    self:sameLine()
+    
+    self:button("bleh",function()
+        print("real")
+    end)
+    
     self:popStyle()
     
-    self:checkbox(bool,"checkbox")
+    self:checkbox("bool","checkbox")
     
-    self:slider("windowRounding","windowRounding",{
+    self:separatorText("Borders")
+    
+    self:sliderFloat("windowBorderSize","windowBorderSize",{
+        min=0,
+        max=1,
+    },function(float)
+        style.windowBorderSize=windowBorderSize
+        
+        return string.format("%.0f",float)
+    end)
+    
+    self:separatorText("Rounding")
+    
+    self:sliderFloat("windowRounding","windowRounding",{
         min=0,
         max=20,
     },function(float)
-        style.windowRounding=float
-        
-        return math.round(float).." ; "..style.windowRounding
+        style.windowRounding=windowRounding
+    
+        return string.format("%.0f",float)
     end)
     
-    self:slider("frameRounding","frameRounding",{
+    self:sliderFloat("frameRounding","frameRounding",{
         min=0,
         max=12,
     },function(float)
-        style.frameRounding=float
+        style.frameRounding=frameRounding
         
-        return math.round(float).." ; "..style.frameRounding
+        render.setColor(Color((360/12)*float,1,1):hsvToRGB())
+        
+        return string.format("%.0f",float)
+    end)
+    
+    self:sliderFloat("grabRounding","grabRounding",{
+        min=0,
+        max=12,
+    },function(float)
+        style.grabRounding=grabRounding
+        
+        return string.format("%.0f",float)
     end)
 end)
 
@@ -106,7 +144,11 @@ hook.add("render","",function()
     for i=1,25 do
         samples[i]=math.sin(i*0.4+timer.realtime()*3)*5
     end
-
+    
+    if bool then
+        colors.frameBg=Color(timer.realtime()*20,1,0.5):hsvToRGB()
+    end
+    
     viva:render()
     --hitboxes.renderDebug()
 end)

@@ -111,6 +111,9 @@ function viva:render()
 
             for i,self in pairs(window.drawStack) do
                 if stack.y<(data.height/0.7)-18 then
+                    --stack.x<(data.width/0.7)-18
+                    --causes stack.x collapse ^ fix to hide stack.x elements
+
                     if self.type=="pushStyle" then
                         stack.style=self.style
                     end
@@ -120,7 +123,6 @@ function viva:render()
                     end
 
                     if viva.widgets[self.type] then
-
                         local modifier=window.drawStack[i+1]
                         local draw=viva.widgets[self.type](window,self,stack,i) 
                         

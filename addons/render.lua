@@ -1,3 +1,22 @@
+local _drawText=render.drawText
+
+function render.drawText(x,y,text,alignment,window)
+    if window then
+        local data=window.data
+
+        for i=1,#text do
+            local w,_=render.getTextSize(string.sub(text,1,i))
+
+            if data.x+(x+w)*0.7>=data.x+data.width then
+                text=string.sub(text,1,i-1)
+
+                break
+            end 
+        end
+    end
+    
+    _drawText(x,y,text,alignment)
+end
 function render.drawOutlineRounded(x, y, w, h, r, f)
     local coords={}
     local f2=f*2

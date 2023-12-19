@@ -117,7 +117,7 @@ viva.registerWidgets({
                 render.drawRoundedBox(stack.style and stack.style.frameRounding or style.frameRounding,stack.x,stack.y,width,15.5)
 
                 render.setColor(stack.style and stack.style.text or colors.text)
-                render.drawText(stack.x+width+3,stack.y,self.name)
+                render.drawText(stack.x+width+3,stack.y,self.name,nil,window)
 
                 render.setColor(stack.style and stack.style.sliderGrab or colors.sliderGrab)
                 render.drawRoundedBox(stack.style and stack.style.grabRounding or style.grabRounding,stack.x+(width*(math.clamp(float or _G[self.var],self.data.min,self.data.max)-self.data.min)/ratio),stack.y,margin,16)
@@ -208,7 +208,7 @@ viva.registerWidgets({
             end)
             
             render.setColor(stack.style and stack.style.text or colors.text)
-            render.drawText(stack.x+width*4+33,stack.y+1,self.name)
+            render.drawText(stack.x+width*4+33,stack.y+1,self.name,nil,window)
 
             return {
                 x=0,
