@@ -110,7 +110,7 @@ function viva:render()
             }
 
             for i,self in pairs(window.drawStack) do
-                if stack.y<(data.height/0.7)-20 then
+                if stack.y<(data.height/0.7)-18 then
                     if self.type=="pushStyle" then
                         stack.style=self.style
                     end

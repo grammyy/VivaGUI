@@ -98,7 +98,6 @@ function viva.init(flags)
             fonts={
                 [1]="DermaDefault"
             },
-            frameRounding=flags.style.frameRounding or 3,
             windowBorder=flags.style.windowBorder or true,
             frameBorder=flags.style.frameBorder or false,
             popupBorder=flags.style.popupBorder or true,

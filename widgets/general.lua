@@ -15,7 +15,7 @@ viva.registerWidgets({
 
             render.setColor(stack.style and stack.style.separator or colors.separator)
             render.drawRect(stack.x,stack.y+9.25-(style.separatorTextBorderSize/2),10,style.separatorTextBorderSize)
-            render.drawRect(stack.x+14.5+w,stack.y+9.25-(style.separatorTextBorderSize/2),(data.width-31)/0.7-stack.x,style.separatorTextBorderSize)
+            render.drawRect(stack.x+14.5+w,stack.y+9.25-(style.separatorTextBorderSize/2),(data.width-13.5)/0.7-stack.x-w,style.separatorTextBorderSize)
 
             return {
                 x=0,
@@ -87,7 +87,7 @@ viva.registerWidgets({
         end
     },
     {
-        "slider",
+        "sliderFloat",
         {
             "name",
             "var",
@@ -97,17 +97,17 @@ viva.registerWidgets({
         function(window,self,stack,id)
             local w,_=render.getTextSize(self.name)
             local data=window.data
-            
-            local width=95*(data.width/100)
-            local ratio=self.data.max-self.data.min
-            local margin=width/ratio
+            local float=self.func and self.func(_G[self.var]) or nil
 
+            local width=95*(data.width/100)
+            local ratio=self.data.max-self.data.min+1
+            local margin=width/ratio
+            
             render.setColor(stack.style and stack.style.frameBg or colors.frameBg)
 
             hitboxes.create(window,3,window.name..self.type..id,data.x+(stack.x*0.7),data.y+(stack.y*0.7),width*0.7,10.85,function()
                 window:dragEvent(function()
-                    _G[self.var]=math.clamp((ratio*(cursor.x-data.x-stack.x*0.7)/(width)/0.7)+self.data.min,self.data.min,self.data.max)
-                    --slider math a bit off, fix later
+                    _G[self.var]=math.clamp((ratio*(cursor.x-data.x-stack.x*0.7-(margin/2)*0.7)/(width)/0.7)+self.data.min,self.data.min,self.data.max)
                 end,hitboxes.purge)
             end,function()
                 if !data.event then
@@ -120,11 +120,11 @@ viva.registerWidgets({
                 render.drawText(stack.x+width+3,stack.y,self.name)
 
                 render.setColor(stack.style and stack.style.sliderGrab or colors.sliderGrab)
-                render.drawRoundedBox(stack.style and stack.style.grabRounding or style.grabRounding,stack.x+(width*(math.clamp(_G[self.var],self.data.min+0.4,self.data.max-0.5)-self.data.min)/ratio)-margin/2,stack.y,margin,15.5)
+                render.drawRoundedBox(stack.style and stack.style.grabRounding or style.grabRounding,stack.x+(width*(math.clamp(float or _G[self.var],self.data.min,self.data.max)-self.data.min)/ratio),stack.y,margin,16)
             
-                if self.func then
+                if self.func and float then
                     render.setColor(stack.style and stack.style.text or colors.text)
-                    render.drawText(stack.x+width/2,stack.y,self.func(_G[self.var]))
+                    render.drawText(stack.x+width/2,stack.y,self.func(_G[self.var]),1)
                 end
             end)
 
@@ -132,6 +132,30 @@ viva.registerWidgets({
                 x=stack.x,
                 y=stack.y+19
             }
+        end
+    },
+    {
+        "sliderFloat2",
+        {
+            "name",
+            "var",
+            "data",
+            "func"
+        },
+        function(window,self,stack,id)
+            
+        end
+    },
+    {
+        "SliderAngle",
+        {
+            "name",
+            "var",
+            "data",
+            "func"
+        },
+        function(window,self,stack,id)
+            
         end
     },
     {

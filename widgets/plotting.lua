@@ -14,7 +14,7 @@ viva.registerWidgets({
 
             for i,value in pairs(self.table) do
                 local hovering=cursor:withinAABox(Vector(data.x,data.y)+Vector(stack.x*0.7+(118.65*((i-1)/(#self.table-1))),stack.y*0.7),Vector(data.x,data.y)+Vector(stack.x*0.7+(118.65*(i/(#self.table-1))),(stack.y+15.5)*0.7))
-                --fix hover math, slightly off ^
+                --fix hover math, slightly off nor accounts for width^
                 
                 if i==#self.table then
                     break
