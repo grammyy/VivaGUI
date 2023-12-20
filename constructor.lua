@@ -122,7 +122,7 @@ function viva.init(flags)
             frameRounding=flags.style.frameRounding or 3,
             popupRounding=flags.style.popupRounding or 3,
             scrollbarRounding=flags.style.scrollbarRounding or 12,
-            grabRounding=flags.style.grabRounding or 3,
+            grabRounding=flags.style.grabRounding or 0,
             tabRounding=flags.style.tabRounding or 3,
 
             cellPadding=flags.style.cellPadding or {4,2},
@@ -164,6 +164,7 @@ function viva.constructor(flags)
         noBringToFront=flags.noBringToFront or false,
         noDocking=flags.noDocking or false,
         noClose=flags.noClose or false,
+        popup=flags.popup or false,
     }
 end
 

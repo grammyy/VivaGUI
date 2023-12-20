@@ -18,7 +18,7 @@ viva.registerWidgets({
             render.drawRect(stack.x+14.5+w,stack.y+9.25-(style.separatorTextBorderSize/2),(data.width-13.5)/0.7-stack.x-w,style.separatorTextBorderSize)
 
             return {
-                x=0,
+                x=stack.x,
                 y=stack.y+18.5
             }
         end
@@ -120,7 +120,7 @@ viva.registerWidgets({
                 render.drawText(stack.x+width+3,stack.y,self.name,nil,window)
 
                 render.setColor(stack.style and stack.style.sliderGrab or colors.sliderGrab)
-                render.drawRoundedBox(stack.style and stack.style.grabRounding or style.grabRounding,stack.x+(width*(math.clamp(float or _G[self.var],self.data.min,self.data.max)-self.data.min)/ratio),stack.y,margin,16)
+                render.drawRoundedBox(stack.style and stack.style.grabRounding or style.grabRounding,stack.x+(width*(math.clamp(float or _G[self.var],self.data.min,self.data.max)-self.data.min)/ratio),stack.y,math.max(margin,1),16)
             
                 if self.func and float then
                     render.setColor(stack.style and stack.style.text or colors.text)
@@ -193,14 +193,15 @@ viva.registerWidgets({
 
             hitboxes.create(window,3,window.name..self.type..id,stack.x*0.7+data.x+9.8+(width*4)*0.7,data.y+(stack.y*0.7),10.85,10.85,function()
                 viva:new(nil,{
-                    width=100,
-                    height=100,
+                    width=150,
+                    height=160,
                     x=cursor.x,
                     y=cursor.y,
                 },{
-                    noTitlebar=true
+                    noTitlebar=true,
+                    popup=true
                 },function(self)
-                    self:textColored("Important stuff!",Color(timer.realtime()*10,1,1):hsvToRGB())
+                    self:textColored("color2",Color(timer.realtime()*10,1,1):hsvToRGB())
                 end)
             end,nil,function()
                 render.setColor(_G[self.var] or (stack.style and stack.style.textDisabled or colors.textDisabled))

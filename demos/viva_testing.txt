@@ -11,6 +11,9 @@ require("VivaGUI/vivagui.lua")
 testColor=Color(255,255,0)
 samples={}
 bool=false
+size=10
+offsetx=0
+offsety=0
 
 viva:new("My first tool",{
     width=170,
@@ -78,19 +81,19 @@ viva:new("style editor",{
     })
     
     self:button("bleh",function()
-        print("real")
+        print("real2")
     end)
     
     self:sameLine()
     
     self:button("bleh",function()
-        print("real")
+        print("real3")
     end)
     
     self:sameLine()
     
     self:button("bleh",function()
-        print("real")
+        print("real4")
     end)
     
     self:popStyle()
@@ -103,7 +106,7 @@ viva:new("style editor",{
         min=0,
         max=1,
     },function(float)
-        style.windowBorderSize=windowBorderSize
+        style.windowBorderSize=math.round(float)
         
         return string.format("%.0f",float)
     end)
@@ -138,9 +141,34 @@ viva:new("style editor",{
         
         return string.format("%.0f",float)
     end)
+    
+    self:separatorText("Testing")
+
+    self:sliderFloat("cube size","size",{
+        min=10,
+        max=200,
+    },function(float)        
+        return string.format("%.1f",float)
+    end)
+    
+    self:sliderFloat("offset X","offsetx",{
+        min=-500,
+        max=500,
+    },function(float)        
+        return string.format("%.1f",float)
+    end)
+    
+    self:sliderFloat("offset Y","offsety",{
+        min=-500,
+        max=500,
+    },function(float)        
+        return string.format("%.1f",float)
+    end)
 end)
 
 hook.add("render","",function()
+    frameBg=colors.frameBg
+    
     for i=1,25 do
         samples[i]=math.sin(i*0.4+timer.realtime()*3)*5
     end
@@ -148,6 +176,8 @@ hook.add("render","",function()
     if bool then
         colors.frameBg=Color(timer.realtime()*20,1,0.5):hsvToRGB()
     end
+    
+    render.drawRect(512-size/2+offsetx,512/2-size/2+offsety,size,size)
     
     viva:render()
     --hitboxes.renderDebug()

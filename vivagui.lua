@@ -94,7 +94,7 @@ function viva:render()
 
         if style.windowBorderSize>0 then
             render.setColor(colors.border)
-            render.drawOutlineRounded(data.x-1,data.y-1,data.width+1,(data.active and data.height or 12+1)+1,style.windowRounding,5)
+            render.drawOutlineRounded(data.x-1,data.y-1,data.width+1,(data.active and data.height or 12+1)+1,window.flags.popup and style.popupRounding or style.windowRounding,5)
         end
 
         if data.active then
@@ -106,13 +106,13 @@ function viva:render()
 
             local stack={
                 x=style.windowPadding[1]/2,
-                y=(!window.flags.noMenu and table.count(data.menuItems)!=0) and 38+(style.windowPadding[2]-6) or 20+(style.windowPadding[2]-6)
+                y=!window.flags.noTitlebar and ((!window.flags.noMenu and table.count(data.menuItems)!=0) and 38+(style.windowPadding[2]-6) or 20+(style.windowPadding[2]-6)) or style.windowPadding[2]-6
             }
 
             for i,self in pairs(window.drawStack) do
                 local modifier=window.drawStack[i+1]
 
-                if stack.y<(data.height/0.7)-18 and stack.x<(data.width/0.7)-18 then
+                if stack.y<(data.height/0.7)-18 and stack.x<(data.width/0.7)-26 then
                     if self.type=="pushStyle" then
                         stack.style=self.style
                     end
@@ -127,7 +127,7 @@ function viva:render()
                         if modifier and modifier.type!="sameLine" then
                             stack.y=draw.y
                             stack.x=style.windowPadding[1]/2
-                        elseif draw.x<(data.width/0.7)-18 then
+                        elseif draw.x<(data.width/0.7)-26 then
                             stack.x=draw.x
                         end
                     end
@@ -219,60 +219,66 @@ function viva:render()
                 data.y=cursor.y+offset.y
             end,hitboxes.purge)
         end,nil,function()
+            if window.flags.noTitlebar then
+                return
+            end
+            
             render.setColor((data.active and viva.windows[#viva.windows]==window) and colors.titleBgActive or colors.titleBg)
             render.drawRoundedBoxEx(style.windowRounding,data.x,data.y,data.width,12,true,true,false,false)
             --visual bug: create function parented from drawRoundedBox to Ex fill instead ^
         end)
 
-        hitboxes.create(window,2,table.address(window).."toggle",data.x+2.5,data.y+2.5,6.5,6.5,function()
-            data.active=not data.active
+        if !window.flags.noTitlebar then
+            hitboxes.create(window,2,table.address(window).."toggle",data.x+2.5,data.y+2.5,6.5,6.5,function()
+                data.active=not data.active
 
-            hitboxes.purge()
-        end,nil,function()
-            render.setMaterial(mat)
-            render.setColor(colors.text)
-            render.drawTriangle(data.x+3,data.y+3,6,6,data.active and 0 or -90)
-        end)
-
-        hitboxes.create(window,2,table.address(window).."close",data.x+data.width-10,data.y+2.5,6.5,6.5,function()
-            table.removeByValue(viva.windows,window)
-            self=nil
-
-            hitboxes.purge()
-        end,nil,function()
-            render.setColor(colors.text)
-            render.drawLine(data.x+data.width-11,data.y+2.5,data.x+data.width-5,data.y+8)
-            render.drawLine(data.x+data.width-11,data.y+8,data.x+data.width-5,data.y+2.5)
-        end)
-
-        render.setColor(colors.resizeGrip)
-
-        hitboxes.create(window,1,table.address(window).."resize",data.x+data.width-6,data.y+data.height-6,6,6,function()
-            local offset=Vector(data.width,data.height)-cursor
-    
-            window:dragEvent(function()
-                data.width=math.max(cursor.x+offset.x,8.4)
-                data.height=math.max(cursor.y+offset.y,8.4)
-            end,hitboxes.purge,"resizing")
-        end,function()
-            if !data.event then
-                render.setColor(colors.resizeGripHovered)
-            end
-        end,function()
-            if data.event=="resizing" then
-                render.setColor(colors.resizeGripActive)
-            end
-            
-            if data.active then
+                hitboxes.purge()
+            end,nil,function()
                 render.setMaterial(mat)
-                render.drawPoly({
-                    Vector(data.x+data.width,data.y+data.height),
-                    Vector(data.x+data.width-6,data.y+data.height),
-                    Vector(data.x+data.width,data.y+data.height-6)
-                })
-                --visual bug: create function to draw curve ^
-            end
-        end)
+                render.setColor(colors.text)
+                render.drawTriangle(data.x+3,data.y+3,6,6,data.active and 0 or -90)
+            end)
+
+            hitboxes.create(window,2,table.address(window).."close",data.x+data.width-10,data.y+2.5,6.5,6.5,function()
+                table.removeByValue(viva.windows,window)
+                self=nil
+
+                hitboxes.purge()
+            end,nil,function()
+                render.setColor(colors.text)
+                render.drawLine(data.x+data.width-11,data.y+2.5,data.x+data.width-5,data.y+8)
+                render.drawLine(data.x+data.width-11,data.y+8,data.x+data.width-5,data.y+2.5)
+            end)
+
+            render.setColor(colors.resizeGrip)
+
+            hitboxes.create(window,1,table.address(window).."resize",data.x+data.width-6,data.y+data.height-6,6,6,function()
+                local offset=Vector(data.width,data.height)-cursor
+        
+                window:dragEvent(function()
+                    data.width=math.max(cursor.x+offset.x,8.4)
+                    data.height=math.max(cursor.y+offset.y,8.4)
+                end,hitboxes.purge,"resizing")
+            end,function()
+                if !data.event then
+                    render.setColor(colors.resizeGripHovered)
+                end
+            end,function()
+                if data.event=="resizing" then
+                    render.setColor(colors.resizeGripActive)
+                end
+                
+                if data.active then
+                    render.setMaterial(mat)
+                    render.drawPoly({
+                        Vector(data.x+data.width,data.y+data.height),
+                        Vector(data.x+data.width-6,data.y+data.height),
+                        Vector(data.x+data.width,data.y+data.height-6)
+                    })
+                    --visual bug: create function to draw curve ^
+                end
+            end)
+        end
 
         if window.name and !window.flags.noTitlebar then
             context:setScale(Vector(0.75,0.7,0.7))
