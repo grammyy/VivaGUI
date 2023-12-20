@@ -15,28 +15,26 @@ function hitboxes.create(window,layer,id,x,y,w,h,callback,hover,renderFunc)
     if !_hitboxes[layer] then
         _hitboxes[layer]={}
     end
-    
-    if _hitboxes[layer][id] then
+
+    if !_hitboxes[layer][id] then
+        _hitboxes[layer][id]={
+            x=x,
+            y=y,
+            w=w,
+            h=h,
+            callback=callback,
+            hover=false,
+            window=window
+        }
+    else
         if hover and _hitboxes[layer][id].hover then
             hover()
         end
-        
-        if renderFunc then
-            renderFunc(x,y,w,h)
-        end
-        
-        return
+    end 
+
+    if renderFunc then
+        renderFunc(x,y,w,h)
     end
-    
-    _hitboxes[layer][id]={
-        x=x,
-        y=y,
-        w=w,
-        h=h,
-        callback=callback,
-        hover=false,
-        window=window
-    }
 end
 
 function hitboxes.each(_hitboxes,func)

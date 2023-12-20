@@ -92,7 +92,7 @@ function viva:render()
         local data=window.data
         local context=Matrix(nil,Vector(data.x,data.y))
 
-        if style.windowBorderSize then
+        if style.windowBorderSize>0 then
             render.setColor(colors.border)
             render.drawOutlineRounded(data.x-1,data.y-1,data.width+1,(data.active and data.height or 12+1)+1,style.windowRounding,5)
         end
@@ -110,10 +110,9 @@ function viva:render()
             }
 
             for i,self in pairs(window.drawStack) do
-                if stack.y<(data.height/0.7)-18 then
-                    --stack.x<(data.width/0.7)-18
-                    --causes stack.x collapse ^ fix to hide stack.x elements
+                local modifier=window.drawStack[i+1]
 
+                if stack.y<(data.height/0.7)-18 and stack.x<(data.width/0.7)-18 then
                     if self.type=="pushStyle" then
                         stack.style=self.style
                     end
@@ -123,16 +122,17 @@ function viva:render()
                     end
 
                     if viva.widgets[self.type] then
-                        local modifier=window.drawStack[i+1]
                         local draw=viva.widgets[self.type](window,self,stack,i) 
                         
-                        if (modifier and modifier.type!="sameLine") then
+                        if modifier and modifier.type!="sameLine" then
                             stack.y=draw.y
                             stack.x=style.windowPadding[1]/2
-                        else
+                        elseif draw.x<(data.width/0.7)-18 then
                             stack.x=draw.x
                         end
                     end
+                else
+                    stack.x=style.windowPadding[1]/2
                 end
             end
 
@@ -219,7 +219,7 @@ function viva:render()
                 data.y=cursor.y+offset.y
             end,hitboxes.purge)
         end,nil,function()
-            render.setColor(data.active and colors.titleBgActive or colors.titleBg)
+            render.setColor((data.active and viva.windows[#viva.windows]==window) and colors.titleBgActive or colors.titleBg)
             render.drawRoundedBoxEx(style.windowRounding,data.x,data.y,data.width,12,true,true,false,false)
             --visual bug: create function parented from drawRoundedBox to Ex fill instead ^
         end)

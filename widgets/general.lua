@@ -171,7 +171,7 @@ viva.registerWidgets({
             render.setColor(stack.style and stack.style.frameBg or colors.frameBg)
 
             for ii=0,3 do
-                hitboxes.create(window,3,window.name..self.type..id..ii,stack.x*0.7+data.x+2.45*ii+((width*0.7)*ii),data.y+(stack.y*0.7),width*0.7,10.85,function()
+                hitboxes.create(window,3,window.name..self.type..id..ii,stack.x*0.7+data.x+2.45*(ii)+((width*0.7)*ii),data.y+(stack.y*0.7),width*0.7,10.85,function()
                     local offset={cursor.x,_G[self.var][ii+1]}
 
                     window:dragEvent(function()
