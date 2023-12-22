@@ -120,7 +120,7 @@ hook.add("think","cl_hitboxes",function()
             if hitbox.window==frontWindow then
                 hitbox.hover=true
             else
-                if !cursor:withinAABox(Vector(frontWindow.data.x,frontWindow.data.y),Vector(frontWindow.data.x+frontWindow.data.width,frontWindow.data.y+frontWindow.data.height)) then
+                if !cursor:withinAABox(Vector(frontWindow.x,frontWindow.y),Vector(frontWindow.x+frontWindow.width,frontWindow.y+frontWindow.height)) then
                     hitbox.hover=true
                 else
                     hitbox.hover=false

@@ -6,14 +6,13 @@ viva.registerWidgets({
             "table"
         },
         function(window,self,stack)
-            local data=window.data
-            local width=97.5*(data.width/100)+8
+            local width=97.5*(window.width/100)+8
 
             render.setColor(stack.style and stack.style.frameBg or colors.frameBg)
             render.drawRect(stack.x,stack.y,width,15.5)
 
             for i,value in pairs(self.table) do
-                local hovering=cursor:withinAABox(Vector(data.x,data.y)+Vector(stack.x*0.7+(118.65*((i-1)/(#self.table-1))),stack.y*0.7),Vector(data.x,data.y)+Vector(stack.x*0.7+(118.65*(i/(#self.table-1))),(stack.y+15.5)*0.7))
+                local hovering=cursor:withinAABox(Vector(window.x,window.y)+Vector(stack.x*0.7+(118.65*((i-1)/(#self.table-1))),stack.y*0.7),Vector(window.x,window.y)+Vector(stack.x*0.7+(118.65*(i/(#self.table-1))),(stack.y+15.5)*0.7))
                 --fix hover math, slightly off nor accounts for width^
                 
                 if i==#self.table then

@@ -45,13 +45,26 @@ viva:new("My first tool",{
     self:plotLines("Samples",samples)
     
     self:textColored("Important stuff!",testColor)
+    
+    self:checkbox("toggle rgb","bool")
+    
+    self:ratioButton("size: 10","size",10)
+
+    self:sameLine()
+
+    self:ratioButton("size: 20","size",20)
+    
+    self:sameLine()
+
+    self:ratioButton("size: 30","size",30)
 end)
 
 viva:new("style editor",{
     width=150,
-    height=250,
+    height=270,
     x=300,
-    y=70
+    y=70,
+    --active=false
 },nil,function(self)
     windowBg=colors.windowBg
     border=colors.border
@@ -61,8 +74,7 @@ viva:new("style editor",{
     frameRounding=style.frameRounding
     windowBorderSize=style.windowBorderSize
     grabRounding=style.grabRounding
-    
-    self:textColored("Important stuff!",testColor)
+    margin=style.windowPadding[1]
     
     self:colorEdit4("Color","windowBg")
     self:colorEdit4("Color","border")
@@ -80,7 +92,7 @@ viva:new("style editor",{
         button=Color(255,0,0)
     })
     
-    self:button("bleh",function()
+    self:button("bleh2222",function()
         print("real2")
     end)
     
@@ -98,11 +110,11 @@ viva:new("style editor",{
     
     self:popStyle()
     
-    self:checkbox("bool","checkbox")
+    self:checkbox("checkbox","bool")
     
     self:separatorText("Borders")
     
-    self:sliderFloat("windowBorderSize","windowBorderSize",{
+    self:slider("windowBorderSize","windowBorderSize",{
         min=0,
         max=1,
     },function(float)
@@ -113,16 +125,16 @@ viva:new("style editor",{
     
     self:separatorText("Rounding")
     
-    self:sliderFloat("windowRounding","windowRounding",{
+    self:slider("windowRounding","windowRounding",{
         min=0,
-        max=20,
+        max=12,
     },function(float)
         style.windowRounding=windowRounding
     
         return string.format("%.0f",float)
     end)
     
-    self:sliderFloat("frameRounding","frameRounding",{
+    self:slider("frameRounding","frameRounding",{
         min=0,
         max=12,
     },function(float)
@@ -133,7 +145,7 @@ viva:new("style editor",{
         return string.format("%.0f",float)
     end)
     
-    self:sliderFloat("grabRounding","grabRounding",{
+    self:slider("grabRounding","grabRounding",{
         min=0,
         max=12,
     },function(float)
@@ -144,25 +156,34 @@ viva:new("style editor",{
     
     self:separatorText("Testing")
 
-    self:sliderFloat("cube size","size",{
+    self:slider("cube size","size",{
         min=10,
         max=200,
     },function(float)        
         return string.format("%.1f",float)
     end)
     
-    self:sliderFloat("offset X","offsetx",{
+    self:slider("offset X","offsetx",{
         min=-500,
         max=500,
     },function(float)        
         return string.format("%.1f",float)
     end)
     
-    self:sliderFloat("offset Y","offsety",{
+    self:slider("offset Y","offsety",{
         min=-500,
         max=500,
     },function(float)        
         return string.format("%.1f",float)
+    end)
+    
+    self:slider("margin left","margin",{
+        min=0,
+        max=20,
+    },function(float)
+        style.windowPadding[1]=float
+              
+        return string.format("%.0f",float)
     end)
 end)
 

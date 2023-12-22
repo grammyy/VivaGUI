@@ -1,9 +1,7 @@
 local _drawText=render.drawText
 
-function render.drawText(x,y,text,alignment,window)
-    if window then
-        local data=window.data
-
+function render.drawText(x,y,text,alignment,data)
+    if data then
         for i=1,#text do
             local w,_=render.getTextSize(string.sub(text,1,i))
 
@@ -17,7 +15,8 @@ function render.drawText(x,y,text,alignment,window)
     
     _drawText(x,y,text,alignment)
 end
-function render.drawOutlineRounded(x, y, w, h, r, f)
+
+function viva.roundedBox(x,y,w,h,r,f,func)
     local coords={}
     local f2=f*2
  
@@ -44,10 +43,22 @@ function render.drawOutlineRounded(x, y, w, h, r, f)
 
         coords[#coords+1]=Vector(x+r-math.cos(rad)*r, y+h-r-math.sin(rad)*r)
     end
- 
-    for i=1,#coords do
-        render.drawLine(coords[i][1],coords[i][2],(coords[i+1] or coords[1])[1],(coords[i+1] or coords[1])[2])
-    end
+
+    func(coords)
+end
+
+function render.drawOutlineRounded(x,y,w,h,r,f)
+    viva.roundedBox(x,y,w,h,r,f,function(coords)
+        for i=1,#coords do
+            render.drawLine(coords[i][1],coords[i][2],(coords[i+1] or coords[1])[1],(coords[i+1] or coords[1])[2])
+        end
+    end)
+end
+
+function render.drawRoundedBoxEx(x,y,w,h,r,f)
+    viva.roundedBox(x,y,w,h,r,f,function(coords)
+        render.drawPoly(coords)
+    end)
 end
 
 function render.drawTriangle(x,y,width,height,degrees)
