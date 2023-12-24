@@ -33,8 +33,9 @@ viva:new("My first tool",{
         {
             "Close",
             function(self)
-                viva.windows[self.name]=nil
-                self=nil
+                table.removeByValue(viva.windows,self)
+
+                hitboxes.purge()
             end,
             "Ctrl+W"
         }
@@ -72,10 +73,16 @@ viva:new("style editor",{
     menuBarBg=colors.menuBarBg
     windowRounding=style.windowRounding
     frameRounding=style.frameRounding
-    windowBorderSize=style.windowBorderSize
+    windowBorder=style.windowBorder and 1 or 0
     grabRounding=style.grabRounding
     margin=style.windowPadding[1]
     
+    self:button("bleh5",function()
+        print("real")
+    end)
+    
+    self:collapsingHeader("test",{})
+
     self:colorEdit4("Color","windowBg")
     self:colorEdit4("Color","border")
     self:colorEdit4("Color","frameBg")
@@ -110,15 +117,13 @@ viva:new("style editor",{
     
     self:popStyle()
     
-    self:checkbox("checkbox","bool")
-    
     self:separatorText("Borders")
     
-    self:slider("windowBorderSize","windowBorderSize",{
+    self:slider("windowBorder","windowBorder",{
         min=0,
         max=1,
     },function(float)
-        style.windowBorderSize=math.round(float)
+        style.windowBorder=float==1 and true or false
         
         return string.format("%.0f",float)
     end)
@@ -185,6 +190,10 @@ viva:new("style editor",{
               
         return string.format("%.0f",float)
     end)
+    
+    self:checkbox("checkbox","bool")
+    
+    --self:collapsingHeader("test2")
 end)
 
 hook.add("render","",function()
@@ -200,6 +209,6 @@ hook.add("render","",function()
     
     render.drawRect(512-size/2+offsetx,512/2-size/2+offsety,size,size)
     
-    viva:render()
+    viva.render()
     --hitboxes.renderDebug()
 end)

@@ -3,9 +3,10 @@ viva.registerWidgets({
         "plotLines",
         {
             "name",
-            "table"
+            "table",
+            "overlay"
         },
-        function(window,self,stack)
+        function(window,self,stack) --add height style
             local width=97.5*(window.width/100)+8
 
             render.setColor(stack.style and stack.style.frameBg or colors.frameBg)
@@ -21,11 +22,15 @@ viva.registerWidgets({
 
                 render.setColor(hovering and colors.plotLinesHovered or (stack.style and stack.style.plotLines or colors.plotLines))
 
-                render.drawLine(stack.x+(width*((i-1)/(#self.table-1))),stack.y+7.75-value,stack.x+(width*((i)/(#self.table-1))),stack.y+7.75-self.table[i+1])
+                render.drawLine(stack.x+(width*((i-1)/(#self.table-1))),stack.y+7.75-math.clamp(value,-7.75,7.75),stack.x+(width*((i)/(#self.table-1))),stack.y+7.75-math.clamp(self.table[i+1],-7.75,7.75))
             end
 
             render.setColor(stack.style and stack.style.text or colors.text)
             render.drawText(stack.x+width+4,stack.y+1,self.name)
+
+            if self.overlay then
+                render.drawText(stack.x+width/2,stack.y,self.overlay(),1)
+            end
 
             return {
                 x=0,

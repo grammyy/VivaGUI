@@ -14,8 +14,8 @@ viva.registerWidgets({
 
             render.setColor(stack.style and stack.style.separator or colors.separator)
             render.drawRect(stack.x,stack.y+9.25-(style.separatorTextBorderSize/2),10,style.separatorTextBorderSize)
-            render.drawRect(stack.x+14.5+w,stack.y+9.25-(style.separatorTextBorderSize/2),(window.width-13.5)/0.7-stack.x-w,style.separatorTextBorderSize)
-
+            render.drawRect(stack.x+14.5+w,stack.y+9.25-(style.separatorTextBorderSize/2),window.width/0.7-stack.x-w-21,style.separatorTextBorderSize)
+            
             return {
                 x=stack.x,
                 y=stack.y+18
@@ -33,7 +33,7 @@ viva.registerWidgets({
 
             render.setColor(stack.style and stack.style.button or colors.button)
 
-            hitboxes.create(window,3,window.name..self.type..id,window.x+stack.x*0.7,window.y+stack.y*0.7,(w+6)*0.7,10.85,function()
+            hitboxes.create(window,3,table.address(window)..id,window.x+stack.x*0.7,window.y+stack.y*0.7,(w+6)*0.7,10.85,function()
                 if self.func then
                     self.func()
                 end
@@ -63,7 +63,7 @@ viva.registerWidgets({
         function(window,self,stack,id)
             render.setColor(stack.style and stack.style.frameBg or colors.frameBg)
 
-            hitboxes.create(window,3,window.name..self.type..id,window.x+stack.x*0.7,window.y+stack.y*0.7,10.85,10.85,function()
+            hitboxes.create(window,3,table.address(window)..id,window.x+stack.x*0.7,window.y+stack.y*0.7,10.85,10.85,function()
                 _G[self.var]=not _G[self.var]
             end,function()
                 if !window.event then
@@ -94,7 +94,7 @@ viva.registerWidgets({
 
             render.setColor(stack.style and stack.style.frameBg or colors.frameBg)
             
-            hitboxes.create(window,3,window.name..self.type..id,window.x+stack.x*0.7,window.y+stack.y*0.7,10.85,10.85,function()
+            hitboxes.create(window,3,table.address(window)..id,window.x+stack.x*0.7,window.y+stack.y*0.7,10.85,10.85,function()
                 _G[self.var]=self.float
             end,nil,function()
                 render.drawRoundedBox(20,stack.x,stack.y,15.5,15.5)
@@ -120,9 +120,10 @@ viva.registerWidgets({
             "name",
             "var",
             "window",
-            "func"
+            "func",
+            "held"
         },
-        function(window,self,stack,id)
+        function(window,self,stack,id) --add clicking trigger
             local w,_=render.getTextSize(self.name)
             local float=self.func and self.func(_G[self.var]) or nil
 
@@ -132,9 +133,13 @@ viva.registerWidgets({
             
             render.setColor(stack.style and stack.style.frameBg or colors.frameBg)
 
-            hitboxes.create(window,3,window.name..self.type..id,window.x+(stack.x*0.7),window.y+(stack.y*0.7),width*0.7,10.85,function()
+            hitboxes.create(window,3,table.address(window)..id,window.x+(stack.x*0.7),window.y+(stack.y*0.7),width*0.7,10.85,function()
                 window:dragEvent(function()
                     _G[self.var]=math.clamp((ratio*(cursor.x-window.x-stack.x*0.7-(margin/2)*0.7)/(width)/0.7)+self.window.min,self.window.min,self.window.max)
+                
+                    if self.held then
+                        self.held(_G[self.var])
+                    end
                 end,hitboxes.purge)
             end,function()
                 if !window.event then
@@ -174,18 +179,6 @@ viva.registerWidgets({
         end
     },
     {
-        "SliderAngle",
-        {
-            "name",
-            "var",
-            "window",
-            "func"
-        },
-        function(window,self,stack,id)
-            
-        end
-    },
-    {
         "colorEdit4",
         {
             "name",
@@ -197,7 +190,7 @@ viva.registerWidgets({
             render.setColor(stack.style and stack.style.frameBg or colors.frameBg)
 
             for ii=0,3 do
-                hitboxes.create(window,3,window.name..self.type..id..ii,stack.x*0.7+window.x+2.45*(ii)+((width*0.7)*ii),window.y+(stack.y*0.7),width*0.7,10.85,function()
+                hitboxes.create(window,3,table.address(window)..id..ii,stack.x*0.7+window.x+2.45*(ii)+((width*0.7)*ii),window.y+(stack.y*0.7),width*0.7,10.85,function()
                     local offset={cursor.x,_G[self.var][ii+1]}
 
                     window:dragEvent(function()
@@ -217,7 +210,7 @@ viva.registerWidgets({
                 end)
             end
 
-            hitboxes.create(window,3,window.name..self.type..id,stack.x*0.7+window.x+9.8+(width*4)*0.7,window.y+(stack.y*0.7),10.85,10.85,function()
+            hitboxes.create(window,3,table.address(window)..id,stack.x*0.7+window.x+9.8+(width*4)*0.7,window.y+(stack.y*0.7),10.85,10.85,function()
                 viva:new(nil,{
                     width=150,
                     height=160,
@@ -238,7 +231,7 @@ viva.registerWidgets({
             render.drawText(stack.x+width*4+33,stack.y+1,self.name,nil,window)
 
             return {
-                x=0,
+                x=stack.x,
                 y=stack.y+18.5
             }
         end

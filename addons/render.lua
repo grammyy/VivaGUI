@@ -1,4 +1,11 @@
+local mat=material.create("UnlitGeneric")
 local _drawText=render.drawText
+local _drawPoly=render.drawPoly
+
+function render.drawPoly(coords)
+    render.setMaterial(mat)
+    _drawPoly(coords)
+end
 
 function render.drawText(x,y,text,alignment,data)
     if data then
@@ -72,3 +79,45 @@ function render.drawTriangle(x,y,width,height,degrees)
 
     render.popMatrix()
 end
+
+viva.registerWidgets({
+    {
+        "newMenu",
+        {
+            "name",
+            "options"
+        },
+        function(window,self)
+            window.menuItems[self.name]=self.options
+        end,
+        true
+    },
+    {
+        "sameLine",
+        {},
+        nil,
+        true
+    },
+    {
+        "pushStyle",
+        {
+            "style"
+        },
+        function(_,self,stack)
+            return {
+                style=self.style
+            }
+        end,
+        true
+    },
+    {
+        "popStyle",
+        {},
+        function(_,_,stack)
+            return {
+                style=nil
+            }
+        end,
+        true
+    }
+})

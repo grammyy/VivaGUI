@@ -99,8 +99,11 @@ function viva.init(flags)
                 [1]="DermaDefault"
             },
             windowBorder=flags.style.windowBorder or true,
+            childBorder=flags.style.childBorder or true,
             frameBorder=flags.style.frameBorder or false,
             popupBorder=flags.style.popupBorder or true,
+            tabBorder=flags.style.tabBorder or false,
+            tabBarBorder=flags.style.tabBarBorder or true,
 
             windowPadding=flags.style.windowPadding or {8,8},
             framePadding=flags.style.framePadding or {4,3},
@@ -109,13 +112,6 @@ function viva.init(flags)
             indentSpacing=flags.style.indentSpacing or 21,
             scrollBarSize=flags.style.scrollBarSize or 14,
             grabMinSize=flags.style.grabMinSize or 12,
-
-            windowBorderSize=flags.style.windowBorderSize or 1,
-            childBorderSize=flags.style.childBorderSize or 1,
-            popupBorderSize=flags.style.popupBorderSize or 1,
-            frameBorderSize=flags.style.frameBorderSize or 0,
-            tabBorderSize=flags.style.tabBorderSize or 0,
-            tabBarBorderSize=flags.style.tabBarBorderSize or 1,
 
             windowRounding=flags.style.windowRounding or 3,
             childRounding=flags.style.childRounding or 3,
@@ -168,12 +164,13 @@ function viva.constructor(flags)
     }
 end
 
-function viva.registerWidget(name,stack,func)
+function viva.registerWidget(name,stack,func,rule)
     viva[name]=function(self,...)
         local arguments={
-            type=name
+            type=name,
+            rule=rule!=nil and rule or false
         }
-
+        
         for i,v in ipairs({...}) do
             arguments[stack[i]]=v
         end
@@ -186,6 +183,6 @@ end
 
 function viva.registerWidgets(widgets)
     for i,widget in pairs(widgets) do
-        viva.registerWidget(widget[1],widget[2],widget[3])
+        viva.registerWidget(widget[1],widget[2],widget[3],widget[4])
     end
 end
