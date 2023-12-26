@@ -30,6 +30,11 @@ function hitboxes.create(window,layer,id,x,y,w,h,callback,hover,renderFunc)
         if hover and _hitboxes[layer][id].hover then
             hover()
         end
+
+        _hitboxes[layer][id].x=x
+        _hitboxes[layer][id].y=y
+        _hitboxes[layer][id].w=w
+        _hitboxes[layer][id].h=h
     end 
 
     if renderFunc then

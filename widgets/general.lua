@@ -74,6 +74,12 @@ viva.registerWidgets({
 
                 render.setColor(stack.style and stack.style.text or colors.text)
                 render.drawText(stack.x+20,stack.y+1,self.name)
+
+                if _G[self.var] then
+                    render.setColor(stack.style and stack.style.checkMark or colors.checkMark)
+                    render.drawRoundedBox(stack.style and stack.style.frameRounding or style.frameRounding,stack.x+2,stack.y+2,15.5-4,15.5-4)
+                    --need to be actual checkmarks ^
+                end
             end)
 
             return {
@@ -83,7 +89,7 @@ viva.registerWidgets({
         end
     },
     {
-        "ratioButton", --bug: for some reason inits on offset, fixes on usage
+        "ratioButton",
         {
             "name",
             "var",
@@ -103,7 +109,7 @@ viva.registerWidgets({
                 render.drawText(stack.x+20,stack.y+1,self.name)
 
                 if _G[self.var]==self.float then
-                    render.setColor(colors.checkMark)
+                    render.setColor(stack.style and stack.style.checkMark or colors.checkMark)
                     render.drawRoundedBox(20,stack.x+2,stack.y+2,15.5-4,15.5-4)
                 end
             end)
@@ -140,7 +146,7 @@ viva.registerWidgets({
                     if self.held then
                         self.held(_G[self.var])
                     end
-                end,hitboxes.purge)
+                end)
             end,function()
                 if !window.event then
                     render.setColor(stack.style and stack.style.frameBgHovered or colors.frameBgHovered)

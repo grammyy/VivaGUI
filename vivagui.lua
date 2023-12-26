@@ -5,6 +5,8 @@
 --@include VivaGUI/constructor.lua
 --@client
 
+--Version: 2.5 in-dev
+
 require("VivaGUI/constructor.lua")
 requiredir("VivaGUI/resources")
 requiredir("VivaGUI/widgets")
@@ -23,6 +25,8 @@ function viva:initialize(name,data,flags,drawData)
     self.flags=viva.constructor(flags or {})
     self.name=name
     
+    self.scroll=0
+    self.length=0
     self.headers={}
     self.menuItems={}
     self.drawStack={}
@@ -32,7 +36,9 @@ function viva:initialize(name,data,flags,drawData)
     viva.windows[#viva.windows+1]=self
 end
 
-function viva:dragEvent(func,cleanup,name)
+function viva:dragEvent(func,name)
+    func()
+    
     hook.add("mousemoved",name or "dragging",function()
         self.event=name or "dragging"
 
@@ -45,10 +51,6 @@ function viva:dragEvent(func,cleanup,name)
             hook.remove("inputReleased",name or "dragging")
 
             self.event=nil
-
-            if cleanup then
-                cleanup()
-            end
         end
     end)
 end
@@ -60,6 +62,10 @@ function viva:renderStack(stack,drawStack)
         local modifier=drawStack[i+1]
 
         if stack.y<(self.height/0.7)-18 and viva.widgets[widget.type] then
+            if stack.y<0 then
+                stack.x=10000 --temp solution for hidding overflow above
+            end
+
             if widget.rule then
                 local draw=viva.widgets[widget.type](self,widget,stack,i)
                 
@@ -78,6 +84,10 @@ function viva:renderStack(stack,drawStack)
                     stack.x=draw.x
                 end
             end
+        end
+
+        if i==#drawStack then
+            self.length=stack.y-self.scroll
         end
     end
 end
@@ -98,7 +108,7 @@ function viva.render()
 
             local stack={
                 x=style.windowPadding[1],
-                y=!window.flags.noTitlebar and ((!window.flags.noMenu and table.count(window.menuItems)!=0) and 38+(style.windowPadding[2]-6) or 20+(style.windowPadding[2]-6)) or style.windowPadding[2]-6,
+                y=window.scroll+(!window.flags.noTitlebar and ((!window.flags.noMenu and table.count(window.menuItems)!=0) and 38+(style.windowPadding[2]-6) or 20+(style.windowPadding[2]-6)) or style.windowPadding[2]-6),
                 headers={}
             }
 
@@ -122,8 +132,6 @@ function viva.render()
 
                         hitboxes.create(window,3,item..table.address(self),window.x+1.4+(17.5*i)+1.4*i,window.y+12.6,17.5,10.85,function()
                             window.menuItem= window.menuItem==item and nil or item
-
-                            hitboxes.purge()
                         end,function()
                             if !window.event then
                                 if window.menuItem!=item and window.menuItem then
@@ -179,9 +187,9 @@ function viva.render()
             local offset=Vector(window.x,window.y)-cursor
             
             window:dragEvent(function()
-                window.x=cursor.x+offset.x
-                window.y=cursor.y+offset.y
-            end,hitboxes.purge)
+                window.x=math.max(cursor.x+offset.x,0)
+                window.y=math.max(cursor.y+offset.y,0)
+            end)
         end,nil,function()
             if !window.flags.noTitlebar then
                 render.setColor(window.active and ((window.active and viva.windows[#viva.windows]==window) and colors.titleBgActive or colors.titleBg) or colors.titleBigCollapsed)
@@ -192,8 +200,6 @@ function viva.render()
         if !window.flags.noTitlebar then
             hitboxes.create(window,2,table.address(window).."toggle",window.x+2.5,window.y+2.5,6.5,6.5,function()
                 window.active=not window.active
-
-                hitboxes.purge()
             end,nil,function()
                 render.setColor(colors.text)
                 render.drawTriangle(window.x+3,window.y+3,6,6,window.active and 0 or -90)
@@ -201,8 +207,6 @@ function viva.render()
 
             hitboxes.create(window,2,table.address(window).."close",window.x+window.width-10,window.y+2.5,6.5,6.5,function()
                 table.removeByValue(viva.windows,window)
-
-                hitboxes.purge()
             end,nil,function()
                 render.drawLine(window.x+window.width-11,window.y+2.5,window.x+window.width-5,window.y+8)
                 render.drawLine(window.x+window.width-11,window.y+8,window.x+window.width-5,window.y+2.5)
@@ -217,7 +221,9 @@ function viva.render()
                     window:dragEvent(function()
                         window.width=math.max(cursor.x+offset.x,8.4)
                         window.height=math.max(cursor.y+offset.y,8.4)
-                    end,hitboxes.purge,"resizing")
+
+                        hitboxes.purge()
+                    end,"resizing")
                 end,function()
                     if !window.event then
                         render.setColor(colors.resizeGripHovered)
@@ -263,7 +269,7 @@ hook.add("inputPressed","_viva",function(key)
     for i=1,#viva.windows do
         local window=viva.windows[#viva.windows-(i-1)]
         
-        if cursor and cursor:withinAABox(Vector(window.x,window.y),Vector(window.x+window.width,window.y+window.height)) then
+        if cursor and cursor:withinAABox(Vector(window.x,window.y),Vector(window.x+window.width,window.active and window.y+window.height or window.y+12)) then
             if viva.windows[#viva.windows]!=window then
                 table.remove(viva.windows,#viva.windows-(i-1))
 
@@ -274,13 +280,25 @@ hook.add("inputPressed","_viva",function(key)
                         return
                     end
 
-                    hitboxes.purge()
-
                     hook.remove("inputReleased","_viva")
                 end)
             end
             
             return
+        end
+
+        if viva.inputEvent then
+            viva.inputEvent(key)
+        end
+    end
+end)
+
+hook.add("mouseWheeled","_viva",function(delta)
+    for i,window in pairs(viva.windows) do
+        
+        if cursor and cursor:withinAABox(Vector(window.x,window.y),Vector(window.x+window.width,window.active and window.y+window.height or window.y+12)) then
+            window.scroll=math.clamp(window.scroll+(delta*22),-(window.length-window.height),0)
+            --max scroll math off a bit ^
         end
     end
 end)

@@ -14,6 +14,7 @@ bool=false
 size=10
 offsetx=0
 offsety=0
+debug=false
 
 viva:new("My first tool",{
     width=170,
@@ -47,7 +48,7 @@ viva:new("My first tool",{
     
     self:textColored("Important stuff!",testColor)
     
-    self:checkbox("toggle rgb","bool")
+    self:checkbox("debug hitboxes","debug")
     
     self:ratioButton("size: 10","size",10)
 
@@ -87,6 +88,8 @@ viva:new("style editor",{
     self:colorEdit4("Color","border")
     self:colorEdit4("Color","frameBg")
     self:colorEdit4("Color","menuBarBg")
+    
+    self:endHeader()
     
     self:separatorText("Main")
     
@@ -191,7 +194,9 @@ viva:new("style editor",{
         return string.format("%.0f",float)
     end)
     
-    self:checkbox("checkbox","bool")
+    for i=1,4 do
+        self:checkbox("checkbox"..i,"bool")
+    end
     
     --self:collapsingHeader("test2")
 end)
@@ -210,5 +215,8 @@ hook.add("render","",function()
     render.drawRect(512-size/2+offsetx,512/2-size/2+offsety,size,size)
     
     viva.render()
-    --hitboxes.renderDebug()
+    
+    if debug then
+        hitboxes.renderDebug()
+    end
 end)
