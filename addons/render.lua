@@ -90,34 +90,32 @@ viva.registerWidgets({
         function(window,self)
             window.menuItems[self.name]=self.options
         end,
-        true
+        "rule"
     },
     {
         "sameLine",
         {},
         nil,
-        true
+        "rule"
     },
     {
         "pushStyle",
         {
             "style"
         },
-        function(_,self,stack)
+        function(_,self)
             return {
                 style=self.style
             }
         end,
-        true
+        "rule"
     },
     {
         "popStyle",
         {},
         function(_,_,stack)
-            return {
-                style=nil
-            }
+            stack.style=nil
         end,
-        true
+        "rule"
     }
 })

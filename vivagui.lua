@@ -55,31 +55,32 @@ function viva:dragEvent(func,name)
     end)
 end
 
-function viva:renderStack(stack,drawStack)
+function viva:renderStack(stack,drawStack) --some serious variable compression work needed
+    local cache={}
+
     for i,widget in pairs(drawStack) do
-        --stack.x hiding needs to be completed asap
-        
         local modifier=drawStack[i+1]
 
         if stack.y<(self.height/0.7)-18 and viva.widgets[widget.type] then
-            if stack.y<0 then
-                stack.x=10000 --temp solution for hidding overflow above
+            if (stack.y<0 or stack.x>(self.width/0.7)-18) and stack.x!=10000 then
+                cache.x=stack.x --^ temp solution for hidding overflow above/right
+                stack.x=10000
             end
 
-            if widget.rule then
-                local draw=viva.widgets[widget.type](self,widget,stack,i)
+            if widget.rule=="rule" then
+                local draw=viva.widgets[widget.type](self,widget,stack,i,cache)
                 
                 if draw then
                     for key,data in pairs(draw) do
                         stack[key]=data
                     end
                 end
-            elseif !stack.header or table.hasValue(self.headers,stack.header) then
-                local draw=viva.widgets[widget.type](self,widget,stack,i)
+            elseif !stack.header or table.hasValue(self.headers,stack.header[#stack.header]) then
+                local draw=viva.widgets[widget.type](self,widget,stack,i,cache) --cache passed to argument to fix overflow bug
                 
-                if modifier and modifier.type!="sameLine" then
+                if modifier and modifier.type!="sameLine" then --try converting to pure addon later
                     stack.y=draw.y
-                    stack.x=style.windowPadding[1]
+                    stack.x=stack.modify.x or style.windowPadding[1]
                 else
                     stack.x=draw.x
                 end
@@ -109,7 +110,7 @@ function viva.render()
             local stack={
                 x=style.windowPadding[1],
                 y=window.scroll+(!window.flags.noTitlebar and ((!window.flags.noMenu and table.count(window.menuItems)!=0) and 38+(style.windowPadding[2]-6) or 20+(style.windowPadding[2]-6)) or style.windowPadding[2]-6),
-                headers={}
+                modify={}
             }
 
             window:renderStack(stack,window.drawStack)
