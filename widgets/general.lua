@@ -10,7 +10,7 @@ viva.registerWidgets({
             local w,_=render.getTextSize(self.text)
 
             render.setColor(stack.style and stack.style.text or colors.text)
-            render.drawText(stack.x+12.5,stack.y+1,self.text,window)
+            render.drawText(stack.x+12.5,stack.y+1,self.text,window.width)
 
             render.setColor(stack.style and stack.style.separator or colors.separator)
             render.drawRect(stack.x,stack.y+9.25-(style.separatorTextBorderSize/2),10,style.separatorTextBorderSize)
@@ -72,8 +72,12 @@ viva.registerWidgets({
             end,function()
                 render.drawRoundedBox(stack.style and stack.style.frameRounding or style.frameRounding,stack.x,stack.y,15.5,15.5)
 
-                render.setColor(stack.style and stack.style.text or colors.text)
-                render.drawText(stack.x+20,stack.y+1,self.name)
+                if self.name then
+                    w,_=render.getTextSize(self.name or "")
+
+                    render.setColor(stack.style and stack.style.text or colors.text)
+                    render.drawText(stack.x+20,stack.y+1,self.name)
+                end
 
                 if _G[self.var] then
                     render.setColor(stack.style and stack.style.checkMark or colors.checkMark)
@@ -83,7 +87,7 @@ viva.registerWidgets({
             end)
 
             return {
-                x=stack.x,
+                x=stack.x+19+(w and w+4 or 0),
                 y=stack.y+19
             }
         end
@@ -126,13 +130,14 @@ viva.registerWidgets({
             "name",
             "var",
             "window",
-            "func"
+            "func",
+            "held"
         },
         function(window,self,stack,id)
             local w,_=render.getTextSize(self.name)
             local width=95*(window.width/100)
-            local ratio=self.window.max-self.window.min+1
-            local margin=width/ratio
+            local ratio=self.window.max-self.window.min
+            local margin=width/(ratio+1)
 
             local float=(self.func and _G[self.var]) and self.func(_G[self.var],_G[self.var]/ratio) or nil
             
@@ -145,6 +150,11 @@ viva.registerWidgets({
             hitboxes.create(window,3,table.address(window)..id,window.x+(stack.x*0.7),window.y+(stack.y*0.7),width*0.7,10.85,function()
                 window:dragEvent(function()
                     _G[self.var]=math.clamp((ratio*(cursor.x-window.x-stack.x*0.7-(margin/2)*0.7)/(width)/0.7)+self.window.min,self.window.min,self.window.max)
+                    --math off ^, doesnt allow for several things
+
+                    if self.held then
+                        self.held(_G[self.var])
+                    end
                 end)
             end,function()
                 if !window.event then
@@ -154,11 +164,10 @@ viva.registerWidgets({
                 render.drawRoundedBox(stack.style and stack.style.frameRounding or style.frameRounding,stack.x,stack.y,width,15.5)
 
                 render.setColor(stack.style and stack.style.text or colors.text)
-                render.drawText(stack.x+width+3,stack.y,self.name,nil,window)
+                render.drawText(stack.x+width+3,stack.y,self.name,nil,window.width)
 
                 render.setColor(stack.style and stack.style.sliderGrab or colors.sliderGrab)
-                render.drawRoundedBox(stack.style and stack.style.grabRounding or style.grabRounding,stack.x+(width*((math.clamp(float or (_G[self.var] or 0),self.window.min,self.window.max)-self.window.min)/ratio)),stack.y,math.max(margin,1),16)
-                --single unit off ^, probably just needs to be recoded
+                render.drawRoundedBox(stack.style and stack.style.grabRounding or style.grabRounding,stack.x+(width*((math.clamp(float or (_G[self.var] or 0),self.window.min,self.window.max)-self.window.min)/(ratio+1)))+1.45,stack.y,math.max(margin,1),16)
 
                 if self.func and float then
                     render.setColor(stack.style and stack.style.text or colors.text)
@@ -229,7 +238,7 @@ viva.registerWidgets({
             end)
             
             render.setColor(stack.style and stack.style.text or colors.text)
-            render.drawText(stack.x+width*4+33,stack.y+1,self.name,nil,window)
+            render.drawText(stack.x+width*4+33,stack.y+1,self.name,nil,window.width)
 
             return {
                 x=stack.x,

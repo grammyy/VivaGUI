@@ -19,7 +19,7 @@ viva.registerWidgets({
             end)
 
             render.setColor(stack.style and stack.style.text or colors.text)
-            render.drawText(stack.x+20,stack.y+1,self.name)
+            render.drawText(stack.x+20,stack.y+1,self.name,nil,window.width-7)
             render.drawTriangle(stack.x+4,stack.y+4,9,9,window.headers[self.name] and 0 or -90)
             
             if !window.headers[self.name] then
@@ -28,7 +28,15 @@ viva.registerWidgets({
             end
 
             if self.closeButton then
-                --x symbol function here, create one
+                hitboxes.create(window,2,table.address(window)..id.."close",window.x+window.width-style.windowPadding[1]-8.5,window.y+(stack.y+4)*0.7,6.5,6.5,function()
+                    self.hidden=true
+
+                    hitboxes.purge()
+                end,function()
+
+                end,function()
+                    render.drawExMark(((window.width-style.windowPadding[1]-4)/0.7)-6,stack.y+4.5,7,7)
+                end)
             end
 
             return {

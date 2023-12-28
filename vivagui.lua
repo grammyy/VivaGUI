@@ -5,7 +5,13 @@
 --@include VivaGUI/constructor.lua
 --@client
 
---Version: 2.5 in-dev
+--Version: 2.7 in-dev
+
+--todo next:
+    --hook up more internal vars to main
+    --scrollbar
+    --fix slider pointer math
+    --slider2 ^ needs to be done right after this
 
 require("VivaGUI/constructor.lua")
 requiredir("VivaGUI/resources")
@@ -56,6 +62,14 @@ function viva:dragEvent(func,name)
 end
 
 function viva:renderStack(stack,drawStack) --some serious variable compression work needed
+    --temp notes, going to be pushed to wiki soon
+
+    --cache stores things like x to return to for treenode overflow events
+    --widget stores all argumentive or modifiable instance variables such as 'hidden'
+    --draw refers to the post draw of the widgets arguments type, it returns the modified stack 
+        --stack instanced modifiers can be pushed by draw ^
+    --stack refers to the draw order and settings matrix, such as pushing styles and then popping them later
+
     local cache={}
 
     for i,widget in pairs(drawStack) do
@@ -68,14 +82,14 @@ function viva:renderStack(stack,drawStack) --some serious variable compression w
             end
 
             if widget.rule=="rule" then
-                local draw=viva.widgets[widget.type](self,widget,stack,i,cache)
+                local rule=viva.widgets[widget.type](self,widget,stack,i,cache)
                 
-                if draw then
-                    for key,data in pairs(draw) do
+                if rule then
+                    for key,data in pairs(rule) do
                         stack[key]=data
                     end
                 end
-            elseif !stack.header or table.hasValue(self.headers,stack.header[#stack.header]) then
+            elseif (!stack.header or table.hasValue(self.headers,stack.header[#stack.header])) and !widget.hidden then
                 local draw=viva.widgets[widget.type](self,widget,stack,i,cache) --cache passed to argument to fix overflow bug
                 
                 if modifier and modifier.type!="sameLine" then --try converting to pure addon later
@@ -115,7 +129,7 @@ function viva.render()
 
             window:renderStack(stack,window.drawStack)
 
-            if !window.flags.noMenu then
+            if !window.flags.noMenu then --convert into addon soon, and fix word length issue
                 if table.count(window.menuItems)!=0 then
                     local i=-1
 
@@ -132,7 +146,8 @@ function viva.render()
                         end
 
                         hitboxes.create(window,3,item..table.address(self),window.x+1.4+(17.5*i)+1.4*i,window.y+12.6,17.5,10.85,function()
-                            window.menuItem= window.menuItem==item and nil or item
+                            window.menuItem=window.menuItem==item and nil or item
+                            print(Color(255,204,229),window.menuItem.." <-- "..item)
                         end,function()
                             if !window.event then
                                 if window.menuItem!=item and window.menuItem then
@@ -208,9 +223,10 @@ function viva.render()
 
             hitboxes.create(window,2,table.address(window).."close",window.x+window.width-10,window.y+2.5,6.5,6.5,function()
                 table.removeByValue(viva.windows,window)
+
+                hitboxes.purge()
             end,nil,function()
-                render.drawLine(window.x+window.width-11,window.y+2.5,window.x+window.width-5,window.y+8)
-                render.drawLine(window.x+window.width-11,window.y+8,window.x+window.width-5,window.y+2.5)
+                render.drawExMark(window.x+window.width-10,window.y+2.5,5.5,5.5)
             end)
 
             if window.active then
@@ -261,45 +277,3 @@ function viva.render()
         end
     end
 end
-
-hook.add("inputPressed","_viva",function(key)
-    if !hitboxes.filter(key) then
-        return
-    end
-
-    for i=1,#viva.windows do
-        local window=viva.windows[#viva.windows-(i-1)]
-        
-        if cursor and cursor:withinAABox(Vector(window.x,window.y),Vector(window.x+window.width,window.active and window.y+window.height or window.y+12)) then
-            if viva.windows[#viva.windows]!=window then
-                table.remove(viva.windows,#viva.windows-(i-1))
-
-                viva.windows[#viva.windows+1]=window
-                
-                hook.add("inputReleased","_viva",function(key)
-                    if !hitboxes.filter(key) then
-                        return
-                    end
-
-                    hook.remove("inputReleased","_viva")
-                end)
-            end
-            
-            return
-        end
-
-        if viva.inputEvent then
-            viva.inputEvent(key)
-        end
-    end
-end)
-
-hook.add("mouseWheeled","_viva",function(delta)
-    for i,window in pairs(viva.windows) do
-        
-        if cursor and cursor:withinAABox(Vector(window.x,window.y),Vector(window.x+window.width,window.active and window.y+window.height or window.y+12)) then
-            window.scroll=math.clamp(window.scroll+(delta*22),-(window.length-window.height),0)
-            --max scroll math off a bit ^
-        end
-    end
-end)

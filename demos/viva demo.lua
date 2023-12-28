@@ -64,6 +64,15 @@ viva:new("style editor",{
     y=200
     --active=false
 },nil,function(self)
+    --self:newMenu("Menu",{})
+    
+    --self:newMenu("Examples",{})
+    
+    --self:newMenu("Help",{})
+    self:treeNode("testin shit")
+        
+    self:endNode()
+    
     self:collapsingHeader("Help")
     self:endHeader()
     

@@ -164,18 +164,31 @@ function viva.constructor(flags)
     }
 end
 
+local errors=false
+
 function viva.registerWidget(name,stack,func,rule)
     viva[name]=function(self,...)
-        local arguments={
+        local args={...}
+        local widget={
             type=name,
             rule=rule!=nil and rule or false
         }
         
-        for i,v in ipairs({...}) do
-            arguments[stack[i]]=v
-        end
+        for i=1, #args do
+            try(function()
+                widget[stack[i]]=args[i]
+            end,function()
+                if !errors then
+                    errors=true
+                
+                    print(Color(255,204,229),"Errors")
+                end
+                
+                print(Color(255,204,229),"        at ",Color(255,255,255),name..".",Color(255,204,229),rule and "<"..rule..">" or "widget",Color(255,255,255),"(",Color(255,204,229),"Argument unhandled: "..i,Color(255,255,255),"): "..#self.drawStack+1)
+            end)
+        end 
 
-        self.drawStack[#self.drawStack+1]=arguments
+        self.drawStack[#self.drawStack+1]=widget
     end
 
     viva.widgets[name]=func

@@ -7,12 +7,12 @@ function render.drawPoly(coords)
     _drawPoly(coords)
 end
 
-function render.drawText(x,y,text,alignment,data)
-    if data then
+function render.drawText(x,y,text,alignment,bounds)
+    if bounds then
         for i=1,#text do
             local w,_=render.getTextSize(string.sub(text,1,i))
 
-            if data.x+(x+w)*0.7>=data.x+data.width then
+            if (x+w)*0.7>=bounds then
                 text=string.sub(text,1,i-1)
 
                 break
@@ -78,6 +78,11 @@ function render.drawTriangle(x,y,width,height,degrees)
     })
 
     render.popMatrix()
+end
+
+function render.drawExMark(x,y,width,height)
+    render.drawLine(x,y,x+width,y+height)
+    render.drawLine(x,y+height,x+width,y)
 end
 
 viva.registerWidgets({

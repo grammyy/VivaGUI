@@ -122,6 +122,10 @@ hook.add("think","cl_hitboxes",function()
                 curLayer=i
             end
 
+            if !frontWindow then
+                return
+            end
+
             if hitbox.window==frontWindow then
                 hitbox.hover=true
             else
