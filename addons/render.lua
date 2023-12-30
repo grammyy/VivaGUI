@@ -122,5 +122,31 @@ viva.registerWidgets({
             stack.style=nil
         end,
         "rule"
+    },
+    {
+        "indent",
+        {},
+        function(_,_,stack,_,cache)
+            stack.modify.x=(cache.x or stack.x)+(stack.style and stack.style.indentSpacing or style.indentSpacing)
+
+            return {
+                x=stack.x+(stack.style and stack.style.indentSpacing or style.indentSpacing),
+                y=stack.y,
+            }
+        end,
+        "rule"
+    },
+    {
+        "unident",
+        {},
+        function(_,_,stack,_,cache)
+            stack.modify.x=stack.x-(stack.style and stack.style.indentSpacing or style.indentSpacing)
+
+            return {
+                x=stack.x-(stack.style and stack.style.indentSpacing or style.indentSpacing),
+                y=stack.y,
+            }
+        end,
+        "rule"
     }
 })

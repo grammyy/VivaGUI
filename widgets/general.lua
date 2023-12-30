@@ -134,12 +134,13 @@ viva.registerWidgets({
             "held"
         },
         function(window,self,stack,id)
+
             local w,_=render.getTextSize(self.name)
             local width=95*(window.width/100)
-            local ratio=self.window.max-self.window.min
-            local margin=width/(ratio+1)
+            local range=self.window.max-self.window.min
+            local flex=width/(range+1)
 
-            local float=(self.func and _G[self.var]) and self.func(_G[self.var],_G[self.var]/ratio) or nil
+            local float=(self.func and _G[self.var]) and self.func(_G[self.var],_G[self.var]/range) or nil
             
             if type(float)!="number" then
                 float=_G[self.var]
@@ -149,7 +150,7 @@ viva.registerWidgets({
 
             hitboxes.create(window,3,table.address(window)..id,window.x+(stack.x*0.7),window.y+(stack.y*0.7),width*0.7,10.85,function()
                 window:dragEvent(function()
-                    _G[self.var]=math.clamp((ratio*(cursor.x-window.x-stack.x*0.7-(margin/2)*0.7)/(width)/0.7)+self.window.min,self.window.min,self.window.max)
+                    _G[self.var]=math.clamp((range*(cursor.x-window.x-stack.x*0.7-(flex/2)*0.7)/(width)/0.7)+self.window.min,self.window.min,self.window.max)
                     --math off ^, doesnt allow for several things
 
                     if self.held then
@@ -167,11 +168,11 @@ viva.registerWidgets({
                 render.drawText(stack.x+width+3,stack.y,self.name,nil,window.width)
 
                 render.setColor(stack.style and stack.style.sliderGrab or colors.sliderGrab)
-                render.drawRoundedBox(stack.style and stack.style.grabRounding or style.grabRounding,stack.x+(width*((math.clamp(float or (_G[self.var] or 0),self.window.min,self.window.max)-self.window.min)/(ratio+1)))+1.45,stack.y,math.max(margin,1),16)
+                render.drawRoundedBox(stack.style and stack.style.grabRounding or style.grabRounding,stack.x+(width*((math.clamp(float or (_G[self.var] or 0),self.window.min,self.window.max)-self.window.min)/(range+1)))+1.45,stack.y,math.max(flex,1),16)
 
                 if self.func and float then
                     render.setColor(stack.style and stack.style.text or colors.text)
-                    render.drawText(stack.x+width/2,stack.y,self.func(_G[self.var],float/ratio),1)
+                    render.drawText(stack.x+width/2,stack.y,self.func(_G[self.var],float/range),1)
                 end
             end)
 

@@ -5,7 +5,7 @@ viva.registerWidgets({
             "name"
         },
         function(window,self,stack,id,cache)
-            local nodeName="treenode_"..self.name
+            local nodeName="treenode_"..self.name..id
 
             hitboxes.create(window,3,table.address(window)..id,window.x+stack.x*0.7,window.y+stack.y*0.7,math.abs((window.width-style.windowPadding[1]-13.5)-(stack.x-(stack.style and stack.style.indentSpacing or style.indentSpacing))*0.7),9.8,function()
                 window.headers[nodeName]=not window.headers[nodeName]
@@ -21,10 +21,11 @@ viva.registerWidgets({
             end)
             
             if !window.headers[nodeName] then
+                cache.header=stack.header
                 stack.header=nodeName
             end
 
-            stack.modify.x=(cache.x or stack.x)+(stack.style and stack.style.indentSpacing/2 or style.indentSpacing/2)
+            stack.modify.x=(cache.x or stack.x)+(stack.style and stack.style.indentSpacing or style.indentSpacing)
 
             return {
                 x=stack.x+(stack.style and stack.style.indentSpacing or style.indentSpacing),
@@ -35,7 +36,7 @@ viva.registerWidgets({
     {
         "endNode",
         {},
-        function(window,_,stack,_,cache)
+        function(_,_,stack,_,cache) --fix: endnode clears entire stack header
             stack.modify.x=nil
             stack.header=cache.header
             stack.x=style.windowPadding[1]
